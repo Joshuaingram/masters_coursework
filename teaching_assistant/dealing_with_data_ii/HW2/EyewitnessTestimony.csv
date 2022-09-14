@@ -1,0 +1,374 @@
+Juror,Testimony,Instructions,Verdict
+1,weak,standard,not guilty
+2,strong,standard,not guilty
+3,strong,new,not guilty
+4,weak,new,not guilty
+5,weak,new,not guilty
+6,strong,standard,not guilty
+7,strong,standard,not guilty
+8,weak,standard,guilty
+9,weak,standard,not guilty
+10,strong,standard,not guilty
+11,strong,new,not guilty
+12,strong,standard,not guilty
+13,weak,standard,guilty
+14,weak,new,not guilty
+15,weak,standard,not guilty
+16,weak,new,not guilty
+17,strong,new,not guilty
+18,strong,new,not guilty
+19,weak,standard,not guilty
+20,weak,new,not guilty
+21,strong,standard,not guilty
+22,strong,new,not guilty
+23,weak,new,not guilty
+24,strong,new,not guilty
+25,strong,standard,not guilty
+26,weak,new,not guilty
+27,strong,standard,not guilty
+28,weak,new,not guilty
+29,strong,new,not guilty
+30,strong,standard,guilty
+31,weak,standard,not guilty
+32,weak,standard,not guilty
+33,weak,new,not guilty
+34,strong,standard,guilty
+35,strong,standard,not guilty
+36,weak,standard,not guilty
+37,weak,new,not guilty
+38,weak,standard,not guilty
+39,strong,standard,not guilty
+40,weak,standard,guilty
+41,strong,new,not guilty
+42,weak,new,not guilty
+43,strong,standard,guilty
+44,weak,new,guilty
+45,weak,new,not guilty
+46,weak,standard,not guilty
+47,weak,new,guilty
+48,strong,standard,guilty
+49,strong,new,not guilty
+50,strong,new,not guilty
+51,strong,new,not guilty
+52,weak,standard,not guilty
+53,weak,standard,not guilty
+54,weak,new,not guilty
+55,strong,standard,not guilty
+56,weak,new,not guilty
+57,weak,new,guilty
+58,strong,new,not guilty
+59,strong,standard,not guilty
+60,strong,new,not guilty
+61,weak,standard,not guilty
+62,weak,new,not guilty
+63,strong,standard,not guilty
+64,weak,standard,not guilty
+65,strong,standard,guilty
+66,strong,standard,not guilty
+67,strong,new,not guilty
+68,weak,standard,not guilty
+69,weak,new,not guilty
+70,weak,new,not guilty
+71,weak,standard,not guilty
+72,strong,standard,guilty
+73,strong,new,not guilty
+74,strong,new,not guilty
+75,weak,new,not guilty
+76,strong,standard,not guilty
+77,strong,new,not guilty
+78,strong,new,not guilty
+79,weak,standard,guilty
+80,strong,new,not guilty
+81,strong,standard,not guilty
+82,weak,new,not guilty
+83,weak,new,not guilty
+84,weak,standard,guilty
+85,strong,standard,not guilty
+86,strong,new,not guilty
+87,strong,standard,not guilty
+88,strong,new,not guilty
+89,strong,standard,guilty
+90,weak,new,not guilty
+91,weak,standard,not guilty
+92,strong,new,guilty
+93,weak,standard,not guilty
+94,strong,standard,not guilty
+95,weak,new,not guilty
+96,weak,standard,not guilty
+97,strong,standard,not guilty
+98,strong,new,not guilty
+99,strong,new,not guilty
+100,weak,standard,not guilty
+101,strong,new,not guilty
+102,weak,new,not guilty
+103,strong,standard,not guilty
+104,weak,new,not guilty
+105,strong,new,not guilty
+106,weak,standard,not guilty
+107,strong,standard,guilty
+108,weak,standard,guilty
+109,weak,new,not guilty
+110,weak,standard,not guilty
+111,strong,standard,not guilty
+112,strong,standard,not guilty
+113,strong,new,not guilty
+114,weak,new,not guilty
+115,strong,standard,not guilty
+116,weak,new,guilty
+117,strong,new,guilty
+118,weak,standard,not guilty
+119,strong,new,not guilty
+120,strong,new,not guilty
+121,weak,new,not guilty
+122,weak,standard,guilty
+123,weak,new,not guilty
+124,strong,new,not guilty
+125,strong,standard,not guilty
+126,strong,standard,guilty
+127,weak,standard,guilty
+128,weak,standard,not guilty
+129,strong,standard,not guilty
+130,weak,new,not guilty
+131,weak,new,not guilty
+132,strong,standard,not guilty
+133,strong,new,guilty
+134,weak,new,not guilty
+135,weak,standard,guilty
+136,strong,new,not guilty
+137,strong,standard,not guilty
+138,weak,standard,not guilty
+139,weak,new,not guilty
+140,strong,standard,not guilty
+141,strong,new,not guilty
+142,strong,standard,not guilty
+143,weak,new,not guilty
+144,weak,standard,not guilty
+145,weak,new,guilty
+146,strong,standard,not guilty
+147,strong,new,not guilty
+148,weak,new,not guilty
+149,strong,standard,not guilty
+150,weak,standard,not guilty
+151,strong,new,not guilty
+152,weak,new,not guilty
+153,weak,new,not guilty
+154,strong,new,guilty
+155,weak,new,not guilty
+156,weak,standard,not guilty
+157,strong,standard,not guilty
+158,weak,standard,guilty
+159,weak,standard,not guilty
+160,weak,new,not guilty
+161,strong,standard,not guilty
+162,strong,standard,not guilty
+163,strong,new,not guilty
+164,strong,standard,not guilty
+165,strong,new,not guilty
+166,weak,new,not guilty
+167,weak,standard,guilty
+168,strong,new,not guilty
+169,strong,standard,guilty
+170,strong,standard,not guilty
+171,weak,new,not guilty
+172,weak,new,not guilty
+173,weak,standard,not guilty
+174,strong,new,guilty
+175,strong,new,not guilty
+176,weak,standard,not guilty
+177,weak,new,not guilty
+178,strong,standard,guilty
+179,strong,standard,not guilty
+180,weak,new,not guilty
+181,weak,standard,not guilty
+182,strong,new,not guilty
+183,strong,standard,guilty
+184,strong,new,not guilty
+185,strong,new,not guilty
+186,strong,standard,not guilty
+187,weak,new,not guilty
+188,weak,standard,not guilty
+189,weak,new,guilty
+190,weak,new,not guilty
+191,strong,standard,not guilty
+192,strong,new,not guilty
+193,weak,standard,not guilty
+194,strong,new,not guilty
+195,weak,standard,not guilty
+196,weak,new,not guilty
+197,strong,new,not guilty
+198,weak,new,not guilty
+199,weak,standard,not guilty
+200,strong,standard,not guilty
+201,strong,new,not guilty
+202,weak,standard,not guilty
+203,weak,new,not guilty
+204,weak,standard,not guilty
+205,weak,standard,not guilty
+206,weak,new,not guilty
+207,weak,new,not guilty
+208,strong,standard,not guilty
+209,strong,new,not guilty
+210,weak,standard,not guilty
+211,strong,standard,guilty
+212,weak,standard,guilty
+213,strong,new,not guilty
+214,weak,standard,guilty
+215,weak,new,not guilty
+216,strong,new,guilty
+217,strong,new,not guilty
+218,weak,standard,guilty
+219,strong,standard,not guilty
+220,weak,standard,guilty
+221,strong,new,not guilty
+222,weak,new,not guilty
+223,weak,standard,guilty
+224,strong,standard,not guilty
+225,strong,new,guilty
+226,strong,new,not guilty
+227,weak,new,not guilty
+228,strong,standard,guilty
+229,weak,new,not guilty
+230,strong,standard,not guilty
+231,strong,new,not guilty
+232,weak,new,not guilty
+233,strong,new,not guilty
+234,strong,standard,guilty
+235,weak,standard,not guilty
+236,weak,new,guilty
+237,weak,standard,not guilty
+238,strong,new,not guilty
+239,strong,standard,not guilty
+240,weak,standard,not guilty
+241,strong,new,not guilty
+242,strong,standard,guilty
+243,strong,standard,guilty
+244,weak,standard,not guilty
+245,strong,new,not guilty
+246,weak,standard,not guilty
+247,weak,standard,guilty
+248,strong,new,not guilty
+249,strong,standard,not guilty
+250,weak,new,not guilty
+251,strong,new,not guilty
+252,weak,standard,not guilty
+253,weak,standard,not guilty
+254,strong,standard,guilty
+255,strong,new,not guilty
+256,strong,new,not guilty
+257,weak,new,not guilty
+258,weak,standard,not guilty
+259,weak,new,not guilty
+260,strong,standard,not guilty
+261,strong,standard,guilty
+262,strong,new,guilty
+263,weak,new,guilty
+264,weak,standard,not guilty
+265,weak,new,not guilty
+266,strong,new,not guilty
+267,weak,standard,not guilty
+268,weak,new,not guilty
+269,weak,new,guilty
+270,strong,new,not guilty
+271,strong,standard,not guilty
+272,strong,standard,not guilty
+273,strong,standard,not guilty
+274,weak,standard,not guilty
+275,strong,new,guilty
+276,strong,standard,not guilty
+277,weak,new,not guilty
+278,strong,new,not guilty
+279,strong,standard,guilty
+280,strong,new,guilty
+281,strong,new,not guilty
+282,weak,standard,not guilty
+283,weak,new,not guilty
+284,weak,new,not guilty
+285,strong,new,not guilty
+286,strong,standard,not guilty
+287,weak,new,not guilty
+288,weak,new,guilty
+289,strong,standard,not guilty
+290,strong,new,not guilty
+291,weak,standard,not guilty
+292,strong,standard,guilty
+293,strong,new,not guilty
+294,weak,new,guilty
+295,weak,new,not guilty
+296,weak,standard,not guilty
+297,strong,standard,not guilty
+298,weak,standard,not guilty
+299,strong,new,not guilty
+300,weak,standard,not guilty
+301,strong,standard,not guilty
+302,weak,new,not guilty
+303,strong,standard,not guilty
+304,weak,new,not guilty
+305,strong,new,not guilty
+306,weak,standard,guilty
+307,strong,standard,not guilty
+308,strong,new,not guilty
+309,weak,standard,not guilty
+310,weak,standard,not guilty
+311,strong,new,guilty
+312,strong,standard,guilty
+313,strong,standard,not guilty
+314,weak,new,not guilty
+315,strong,new,not guilty
+316,weak,standard,guilty
+317,weak,standard,not guilty
+318,strong,new,not guilty
+319,strong,standard,not guilty
+320,weak,standard,not guilty
+321,weak,new,not guilty
+322,weak,standard,not guilty
+323,strong,standard,not guilty
+324,weak,new,not guilty
+325,strong,new,not guilty
+326,weak,new,not guilty
+327,strong,standard,guilty
+328,strong,standard,guilty
+329,weak,standard,not guilty
+330,weak,standard,not guilty
+331,strong,new,not guilty
+332,strong,standard,not guilty
+333,weak,new,not guilty
+334,weak,new,not guilty
+335,weak,standard,not guilty
+336,strong,new,not guilty
+337,strong,standard,not guilty
+338,weak,standard,not guilty
+339,strong,new,not guilty
+340,strong,standard,not guilty
+341,strong,new,not guilty
+342,strong,standard,guilty
+343,weak,standard,not guilty
+344,strong,new,guilty
+345,weak,standard,guilty
+346,strong,standard,guilty
+347,weak,standard,guilty
+348,strong,new,not guilty
+349,strong,new,not guilty
+350,strong,standard,not guilty
+351,weak,new,not guilty
+352,strong,standard,not guilty
+353,strong,standard,not guilty
+354,weak,new,not guilty
+355,weak,standard,guilty
+356,weak,standard,not guilty
+357,weak,new,guilty
+358,weak,standard,not guilty
+359,strong,standard,guilty
+360,strong,new,not guilty
+361,weak,new,not guilty
+362,strong,standard,not guilty
+363,strong,new,guilty
+364,weak,standard,guilty
+365,strong,new,not guilty
+366,strong,new,not guilty
+367,weak,new,not guilty
+368,strong,standard,guilty
+369,weak,new,guilty
+370,strong,standard,guilty
+371,weak,new,guilty
+372,weak,new,guilty
+373,weak,new,not guilty

@@ -1,0 +1,220 @@
+---
+title: "Advanced Applied Statistics Homework 1 Answer Key"
+author: "Joshua D. Ingram"
+date: "2022-09-08"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(tidy=TRUE)
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60))
+knitr::opts_chunk$set(fig.height=4, fig.width=6)
+```
+
+## 1. Linear Model Theory
+
+Consider the following linear model for the response vector $\boldsymbol{y}$:
+
+$$
+\boldsymbol{y} = X\boldsymbol{\beta} + \boldsymbol{\epsilon},
+$$
+where we assume
+$$
+\boldsymbol{\epsilon} \sim N(\boldsymbol{0}, \sigma^2I)
+$$
+and hence 
+$$
+\boldsymbol{\mu} = E[\boldsymbol{y}] = X\boldsymbol{\beta}
+$$
+
+Note that to multiply two matrices `A` and `B` in R, you write `A %*% B`, and to get the inverse of a matrix `A`, you write `solve(A)`. To get the transpose of a matrix `A`, use `t(A)`.
+
+  a. Suppose $\boldsymbol{y}=(2,4,3)^t$ and there is only one predictor $\boldsymbol{x}=(1,2,3)^t$. You fit the simple linear regression model with an intercept. Show the model matrix $X$ in R.
+  
+**Answer:**
+
+The model matrix $X$ is given by 
+
+$$
+X = \left[\begin{array}
+{rr}
+1 & x_1 \\
+1 & x_2 \\
+1 & x_3
+\end{array}\right]
+= \left[\begin{array}
+{rr}
+1 & 1 \\
+1 & 2 \\
+1 & 3
+\end{array}\right].
+$$
+In R, this is given by
+
+```{r}
+# Create response vector y
+y <- matrix(c(2,4,3), nrow = 3, ncol = 1)
+# Create model matrix X
+X <- matrix(c(1, 1, 1, 1, 2, 3), nrow = 3)
+print(X)
+```
+
+  b. (theoretical) State the least squares estimate $\hat{\boldsymbol{\beta}}$ of $\boldsymbol{\beta}$ in general matrix form. 
+  
+**Answer:**
+  
+$$
+\hat{\boldsymbol{\beta}} = (X'X)^{-1}X'\boldsymbol{y}
+$$
+  
+  c. (practical) Plug your $X$ matrix from part a into the formula from part b and show the result. Does it agree with the result from `coefficients(fit)` where `fit <- lm(y~x)`? Hint: In R, make sure you define `y` as a matrix, i.e., `y <- matrix(c(2,4,3), nrow=3,ncol=1)` and not simply `y <- c(2,4,3)`, as otherwise you can't do proper matrix multiplication in R.
+
+**Answer:**
+  
+```{r}
+# Calculate beta-hat vector
+beta_hat <- solve(t(X)%*%X) %*% t(X) %*% y
+
+# fit simple linear regression model 
+fit <- lm(y~ X[,2])
+
+# Coefficients from lm()
+coef <- coefficients(fit)
+
+# Coefficients from formula in part b
+print(beta_hat)
+
+# Cofficients from fit using lm():
+print(coef)
+```
+
+The manual calculations agree with the results from the built in `coefficients(fit)`. 
+
+  d. (practical) In class, we showed that $\mbox{Var}[\hat{\boldsymbol{\beta}}] = \sigma^2(X^tX)^{-1}$. Find the estimate of $\sigma$ from `summary(fit)` (I told you where to find this on the output), square it to get the estimate of $\sigma^2$, and then use this estimate to estimate $\mbox{Var}[\hat{\boldsymbol{\beta}}]$. Print out this estimated variance-covariance matrix and compare with what you get from `vcov(fit)`.
+  
+**Answer:**
+  
+```{r}
+# sigma from summary fit function (listed as residual standard error when calling summary(fit))
+sigma <- summary(fit)$sigma
+
+# variance-covariance matrix
+var_beta_hat <- sigma^2 * solve(t(X)%*%X)
+
+# variance-covariance from vcov()
+vcov <- vcov(fit)
+
+# Calculated Variance-Covariance Matrix
+print(var_beta_hat)
+# Variance-Covariance from vcov()
+print(vcov)
+```
+
+The manual calculation of the variance-covariance matrix agree with the results from the built in `vcov(fit)`. 
+
+  e. (practical) Refer to the estimate of the variance-covariance matrix you just computed in part d. Get its diagonal elements (R command `diag`) and take the square root of the diagonal elements? Compare what you get with the output from `summary(fit)`, especially the standard errors!
+  
+**Answer:**
+  
+```{r}
+se_beta_hat <- sqrt(diag(var_beta_hat))
+
+sum_fit <- summary(fit)
+
+# Calculated standard errors of coefficients
+print(se_beta_hat)
+# Standard Errors of coefficients from lm()
+print(sum_fit$coefficients)
+```
+
+The standard errors given in `summary(fit)$coefficients` are the same as the square root of the diagonals of the estimated variance-covariance matrix we calculate.
+  
+  f. (theoretical) Give the hat matrix $H$ for which $\hat{\boldsymbol{y}} = H\boldsymbol{y}$.
+  
+**Answer:**
+  
+$$
+\hat{\boldsymbol{y}} = X \hat{\boldsymbol{\beta}} = X(X'X)^{-1}X'y
+$$
+
+Thus,
+
+$$
+H = X(X'X)^{-1}X'.
+$$
+  
+  g. (practical) Plug the $X$ matrix from part a into $H$ and compute $H$. Also, just for fun, compute i) $H^t$ and ii) $HH$. What do you notice? Finally, use $H$ to compute $\hat{\boldsymbol{y}}$. Does this result agree with the R command `fitted(fit)`?
+  
+**Answer:**
+  
+```{r}
+H <- X %*% solve(t(X)%*%X) %*% t(X)
+print(H)
+```
+
+    i)
+    
+```{r}
+H_t <- t(H)
+print(H_t)
+```
+    
+    ii)
+    
+```{r}
+HH <- H %*% H
+print(HH)
+```
+
+```{r}
+y_hat <- H %*% y
+# Predictions from calculated y-hat
+print(y_hat)
+# Predictions from fitted()
+fitted(fit)
+```
+
+
+
+$H$ has the properties of symmetry and idempotency, so $HH = H$ and $H' = H$. Using the hat matrix $H$ to compute $\hat{\boldsymbol{y}} = H\boldsymbol{y}$ gives the same results as using the `fitted(fit)` function.
+  
+  h. (theoretical) Show that $\mbox{E}[\hat{\boldsymbol{y}}] = \boldsymbol{\mu}$.
+  
+**Answer:**
+  
+$$
+E[\hat{\boldsymbol{y}}] = E[H\mathbf{y}] = HE[\mathbf{y}] = HX\boldsymbol{\beta} + HE[\boldsymbol{\epsilon}]
+$$
+
+$$
+= HX\boldsymbol{\beta} + \boldsymbol{0} = X(X'X)^{-1}X'X\boldsymbol{\beta} = X\boldsymbol{\beta} = \boldsymbol{\mu}.
+$$
+  
+  i. (theoretical) Show that $\mbox{Var}[\hat{\boldsymbol{y}}] = \sigma^2H$, using the fact (see part g) that $HH=H$. ($H$ is "idempotent")
+  
+**Answer:**
+  
+$$
+Var[\hat{\boldsymbol{y}}] = Var[H\boldsymbol{y}] = HVar[\boldsymbol{\boldsymbol{y}}]H'=H\sigma^2IH' = \sigma^2HIH = \sigma^2H. 
+$$
+Note that $HH = H$ due to the symmetry and idempotency of $H$.
+
+  j. (practical) Find the estimate of $\sigma$ from `summary(fit)` (I told you where to find this on the output), square it to get the estimate of $\sigma^2$, and then use it and your computed $H$ from part g to find the estimate of $\sigma^2H$. Then, take the diagonal of this matrix (R command `diag`) and then take the square root of these diagonal elements. Compare these to what you get from the output of `predict(fit, se=TRUE, interval='confidence')`. (This output is what you would use to find a confidence interval for the mean response at the given x-values. To compute the confidence interval, you need the standard errors.)
+  
+**Answer:**
+  
+```{r}
+sqrt(diag(sigma^2 * H))
+predict(fit, se=TRUE, interval="confidence")
+```
+
+We obtain the standard error used to calculate the confidence interval for the mean response of the given x-value.
+
+  k. (theoretical) The residuals are defined as $\boldsymbol{r}=\boldsymbol{y}-\hat{\boldsymbol{y}}$. Show that $\boldsymbol{r}=(I-H)\boldsymbol{y}$. 
+
+**Answer:**
+  
+$$
+\boldsymbol{r}=\boldsymbol{y}-\hat{\boldsymbol{y}} = \boldsymbol{y} - H\boldsymbol{y} = (I - H)\boldsymbol{y}
+$$
