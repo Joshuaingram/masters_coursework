@@ -71,7 +71,19 @@ prop.table(table(survey$`Gender Identity`, survey$`Political View`))
 
 The question above refers to the joint distribution.
 
-### d. Find the conditional distribution of political view, given gender identity. Obtain a side-by-side bar chart in R.
+### d. Find the marginal distribution of political view and write a one sentence statement about it.
+
+#### Answer:
+
+```{r}
+# conditional distribution of political view
+marginal <- addmargins(prop.table(table(survey$`Gender Identity`, survey$`Political View`)))[3,]
+marginal
+```
+
+Identifying as liberal is most common, followed by moderate, then conservative.
+
+### e. Find the conditional distribution of political view, given gender identity. Obtain a side-by-side bar chart in R.
 
 #### Answer:
 
@@ -152,13 +164,13 @@ barplot(conditional,
 
 #### Answer:
 
-The proportion of guilty verdicts for jurors that were presented with strong eyewitness testimony is 1.34 percentage points higher than guilty verdicts for jurors that were presented with strong eyewitness testimony. This is only 1.065 times higher, which is not a considerable difference.
+The proportion of guilty verdicts for jurors that were presented with strong eyewitness testimony is 1.34 percentage points higher than guilty verdicts for jurors that were presented with strong eyewitness testimony. This is 1.065 times higher.
 
 ### e. Is it true that the proportion of jurors watching the recording with the strong testimony is 6% higher than the proportion of jurors watching the recording with the weak testimony? Explain.
 
 #### Answer:
 
-This is not true. The proportion of jurors watching the strong testimony is 1.88 *percentage points* higher than the proportion of jurors watching the recording of the weak testimony. Stated alternatively, the proportion of jurors watching the strong testimony is $\frac{0.5093834 - 0.4906166}{0.4906166}  \times 100 = 3.83$% (*percent*) higher than the proportion of jurors watching the recording of the weak testimony.
+This is true. The proportion of jurors watching the strong testimony is 1.88 *percentage points* higher than the proportion of jurors watching the recording of the weak testimony. Stated alternatively, by using the ratio, the proportion of jurors giving guilty verdicts while watching strong testimonies is 6.5% higher than the poportion of jurors giving guilty verdicts while watching weak testimonies.
 
 ## 3) Textbook Exercise 3.16 - Carbon Footprint of Sandwiches
 

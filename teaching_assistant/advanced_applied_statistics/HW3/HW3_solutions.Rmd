@@ -1,0 +1,104 @@
+---
+title: "Advanced Applied Statistics Homework 3 Solutions"
+author: "Joshua D. Ingram"
+date: "2022-09-19"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(tidy=TRUE)
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60))
+knitr::opts_chunk$set(fig.height=4, fig.width=6)
+```
+
+# 1. 
+
+We define our 4 basis functions for the smoothed linear regression with splines model as follows,
+
+$$
+h_1(x) = 1
+$$
+
+$$
+h_2(x) = x
+$$
+
+$$
+h_3(x) = 
+\begin{cases}
+        (x - \eta_1) & \text{if } x > \eta_1\\
+        0 & \text{otherwise}
+    \end{cases}
+$$
+
+$$
+h_4(x) = 
+\begin{cases}
+        (x - \eta_2) & \text{if } x > \eta_2\\
+        0 & \text{otherwise},
+    \end{cases}
+$$
+
+Now,
+
+$$
+f(x) = \sum_{j = 1}^4 \beta_j h_j(x).
+$$
+
+## Check that for the basis functions $h_1$, $h_2$, $h_3$ and $h_4$ from the end of the class today (Monday):
+
+## a.
+
+for any $x \leq \eta_1$, we get
+
+$$
+         f(x) = \beta_1 + \beta_2 x
+$$
+
+#### Answer:
+
+Given the definitions of the basis functions above, for any $x \leq \eta_1$,
+
+$$
+f(x) = \beta_1 + \beta_2 x + \beta_3*0 + \beta_4*0 = \beta_1 + \beta_2x.
+$$
+
+### b.
+
+For any $x$ such that $\eta_1 < x < \eta_2$, we get
+
+$$
+f(x) = \beta_1 - \beta_3\eta_1 + (\beta_2 + \beta_3)x
+$$
+
+#### Answer:
+
+
+Given the definitions of the basis functions above, for any $\eta_1 < x < \eta_2$,
+
+$$
+f(x) = \beta_1 + \beta_2x + \beta_3(x-\eta_1) = \beta_1 + \beta_2x + \beta_3x - \beta_3 \eta_1
+$$
+
+$$
+f(x) = \beta_1 - \beta_3\eta_1 + (\beta_2 + \beta_3)x.
+$$
+
+### c.
+
+When plugging in $x = \eta_1$ in part b above, we get the expression in part a. (i.e., there is a continuity between the two linear pieces.)
+
+#### Answer:
+
+Given the definitions of the basis functions above, for $x = \eta_1$, we may plug in to the equation in part b,
+
+$$
+f(\eta_1) = \beta_1 -\beta_3 \eta_1 + (\beta_2 + \beta_3)\eta_1 = \beta_1 -\beta_3\eta_1 + \beta_2\eta_1 + \beta_3\eta_1
+$$
+
+$$
+= \beta_1 +\beta_2\eta_1.
+$$
+
+This is the same as if we plugged in $x = \eta_1$ into the expression in part a.
