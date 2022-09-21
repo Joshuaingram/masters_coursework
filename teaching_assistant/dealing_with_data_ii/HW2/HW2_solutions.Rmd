@@ -7,15 +7,12 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_chunk$set(tidy=TRUE)
-knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60))
-knitr::opts_chunk$set(fig.height=4, fig.width=6)
 
 library(readr)
 
-sandwiches <- read_csv("/Users/joshuaingram/Main/Projects/masters_coursework/teaching_assistant/dealing_with_data_ii/HW2/CarbonFootprintSandwiches.csv")
+sandwiches <- read_csv("https://img1.wsimg.com/blobby/go/bbca5dba-4947-4587-b40a-db346c01b1b3/downloads/CarbonFootprintSandwiches.csv")
 
-eyewitness <- read_csv("/Users/joshuaingram/Main/Projects/masters_coursework/teaching_assistant/dealing_with_data_ii/HW2/EyewitnessTestimony.csv")
+eyewitness <- read_csv("https://img1.wsimg.com/blobby/go/bbca5dba-4947-4587-b40a-db346c01b1b3/downloads/EyewitnessTestimony.csv")
 ```
 
 # R Reading
@@ -46,7 +43,7 @@ In class, we looked at Freshmen status vs. political view for a survey of 70 stu
 
 ```{r}
 # import ClassSurvey.csv (nead `readr` package imported to use read_csv())
-survey <- read_csv("/Users/joshuaingram/Main/Projects/masters_coursework/teaching_assistant/dealing_with_data_ii/HW2/ClassSurvey.csv")
+survey <- read_csv("https://img1.wsimg.com/blobby/go/bbca5dba-4947-4587-b40a-db346c01b1b3/downloads/ClassSurvey.csv")
 ```
 
 ```{r}
@@ -164,7 +161,7 @@ barplot(conditional,
 
 #### Answer:
 
-The proportion of guilty verdicts for jurors that were presented with strong eyewitness testimony is 1.34 percentage points higher than guilty verdicts for jurors that were presented with strong eyewitness testimony. This is 1.065 times higher.
+The conditional proportion of guilty verdicts given strong eyewitness testimony is $22.10526/20.76503=6.5 \%$ higher than guilty verdicts given weak eyewitness testimony.
 
 ### e. Is it true that the proportion of jurors watching the recording with the strong testimony is 6% higher than the proportion of jurors watching the recording with the weak testimony? Explain.
 
@@ -183,7 +180,7 @@ The article "Understanding the impact on climate change of convenience food: Car
 ```{r}
 # Using base r
 plot(sandwiches$`EnergyContent (kCal)`, sandwiches$`Carbon footprint (g CO2 eq.)`,
-     main = "Relationship Between Sandwich Energy Content and Carbon Footprint",
+     main = "Relationship Between Sandwich Energy Content \nand Carbon Footprint",
      xlab = "Energy Content (kCal)",
      ylab = "Carbon footprint (g CO2 eq.)")
 
@@ -199,7 +196,7 @@ ggplot(data=sandwiches,
   geom_point(alpha=0.6, size=3, shape=21, fill="red", color="black") +
   #geom_smooth(se=FALSE, color="green") +
   geom_smooth(method="lm", color="blue", se=FALSE) +
-  labs(title = "Relationship Between Sandwich Energy Content and Carbon Footprint")
+  labs(title = "Relationship Between Sandwich Energy Content \nand Carbon Footprint")
 ```
 
 There is a positive relationship between the energy content of the sandwich and its carbon footprint.
@@ -212,4 +209,4 @@ There is a positive relationship between the energy content of the sandwich and 
 cor(sandwiches$`EnergyContent (kCal)`, sandwiches$`Carbon footprint (g CO2 eq.)`)
 ```
 
-The relationship between a sandwiches energy content and its carbon footprint is a moderately strong positive relationship with a correlation coefficient of 0.621. As the energy content of the sandwich increases, we expect to observe an increase in the carbon footprint to produce the sandwich.
+The relationship between a sandwiches energy content and its carbon footprint is approximately linear, with a moderately strong positive relationship with a correlation coefficient of 0.621. As the energy content of the sandwich increases, we expect to observe an increase in the carbon footprint to produce the sandwich.

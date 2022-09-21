@@ -15,11 +15,11 @@ knitr::opts_chunk$set(fig.height=4, fig.width=6)
 library(readr)
 
 # import the "alligator food" data .csv file
-alligator <- read_csv("/Users/joshuaingram/Main/Projects/masters_coursework/teaching_assistant/dealing_with_data_ii/HW1/alligatorfood.csv")
+alligator <- read_csv("https://img1.wsimg.com/blobby/go/bbca5dba-4947-4587-b40a-db346c01b1b3/downloads/alligatorfood.csv")
 # import the "animals" data .csv file
-animals <- read_csv("/Users/joshuaingram/Main/Projects/masters_coursework/teaching_assistant/dealing_with_data_ii/HW1/Animals.csv")
+animals <- read_csv("https://img1.wsimg.com/blobby/go/bbca5dba-4947-4587-b40a-db346c01b1b3/downloads/Animals.csv")
 # import the "youth unemployment" data .csv file
-unemployment <- read_csv("/Users/joshuaingram/Main/Projects/masters_coursework/teaching_assistant/dealing_with_data_ii/HW1/youth_unemployment.csv")
+unemployment <- read_csv("https://img1.wsimg.com/blobby/go/bbca5dba-4947-4587-b40a-db346c01b1b3/downloads/youth_unemployment.csv")
 
 ```
 
