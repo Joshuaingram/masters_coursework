@@ -1,0 +1,42 @@
+{
+    "name": "Joshua D. Ingram",
+    "education": [
+        {
+            "year": 2022,
+            "institution": "New College of Florida"
+            "degree_type": "Bachelor of Arts",
+            "area_of_concentration": "Statistics & Applied Mathematics",
+            "GPA": 4.0
+        },
+        {
+            "year": 2024,
+            "institution": "New College of Florida"
+            "degree_type": "Master's of Science",
+            "area_of_concentration": "Applied Data Science",
+            "GPA": 0
+        }
+    ]
+    "Work": [
+        {
+            "year": 2020,
+            "company": "Center for Astrophysics | Harvard & Smithsonian"
+            "position": "Statistics Research Intern",
+        },
+        {
+            "year": 2021,
+            "company": "NASA"
+            "position": "Statistics Intern",
+        },
+        {
+            "year": 2021,
+            "company": "NASA"
+            "position": "Research Intern",
+        },
+        {
+            "year": 2022,
+            "company": "Center for Astrophysics | Harvard & Smithsonian"
+            "position": "IT Specialist (Statistician)",
+        },
+    
+    ]
+}
