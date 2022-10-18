@@ -32,7 +32,7 @@ $$
 \hat{y} = 9.2 + 77.0(2) = 163.2
 $$
 
-We predict a 2,000 square foot house in Gainseville, FL to have a selling price of \$163,200.
+We predict a 2,000 square foot house in Gainseville, FL to have a selling price of \$163,200 on average.
 
 #### (ii) 3,000 square feet?
 
@@ -42,7 +42,7 @@ $$
 \hat{y} = 9.2 + 77.0(3) = 240.2
 $$
 
-We predict a 3,000 square foot house in Gainseville, FL to have a selling price of \$240,200.
+We predict a 3,000 square foot house in Gainseville, FL to have a selling price of \$240,200 on average.
 
 ### b. Using results in part a, explain how to interpret the slope.
 
@@ -61,10 +61,10 @@ Positive. As the square footage increases, the price increases by the slope.
 **Answer:**
 
 $$
-\hat{y} - y_i = (9.2 + 77.0(3)) - 300 = -59.8
+y_i - \hat{y_i} = 300 - (9.2 + 77.0(3))= 59.8
 $$
 
-We predict a 3,000 square foot house in Gainseville, FL to have a selling price of \$240,200. For the observed housing price of $300,000, we have a residual of -\$59,800. We under predicted the housing price by \$59,800.
+We predict a 3,000 square foot house in Gainseville, FL to have a selling price of \$240,200. For the observed housing price of $300,000, we have a residual of \$59,800. We under predicted the housing price by \$59,800.
 
 ## 3.34 - Regression between cereal sodium and sugar
 

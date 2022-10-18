@@ -1,0 +1,207 @@
+---
+title: "Advanced Applied Statistics Homework 5 Solutions"
+author: "Joshua D. Ingram"
+date: "2022-10-14"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(tidy=TRUE)
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60))
+knitr::opts_chunk$set(fig.height=4, fig.width=6)
+```
+
+# 1. 
+
+Read the updated document on smoothing, which is Chapter 11 in the handout on "Review of the simple linear regression model"
+
+# 2.
+
+I have found some wonderful reading of the material we covered in class this week, in the freely available book Introduction to Statistical Learning, 2nd edition, which you can access here for free:
+
+[statlearning](https://www.statlearning.com/)
+
+## a. Smoothing
+
+Please read Chapter 7, Sections 7.1 to 7.5, all of which should sound familiar.
+
+Then complete Exercise 9, part (e) only, using at least three smooth fits, one of which has to be a regular cubic regression spline, and one of which has to be a natural cubic regression spline. You can also try a smoothing spline. (see the handout mentioned in 1) above)
+
+### Exercise 9 (e)
+
+Now fit a regression spline for a range of degrees of freedom, and plot the resulting fits and report the resulting RSS. Describe the results obtained.
+
+**Answer:**
+
+Regular Cubic Regression Spline:
+```{r}
+library(ISLR)
+library(splines)
+# dis is the predictor
+# nox is the response 
+# The knots η1 and η2 are x- values selected on the x-axis to divide it into three regions.
+eta1 <- 80
+eta2 <- 180
+h1 = rep(1,length(x))
+h2 = x
+h3 = xˆ2
+h4 = xˆ3
+h5 = (x - eta1)ˆ3*(x > eta1)
+h6 = (x - eta2)ˆ3*(x > eta2)
+# design matrix X:
+X = cbind(h1, h2, h3, h4, h5, h6)
+X
+
+# fit regression model
+fit.cubic.spline <- lm(longevity ~ -1 + X, data=animals)
+## could also do:
+fit.cubic.spline <- lm(longevity ~ -1 + h1 + h2 + h3 + h4 + h5 + h6, data=animals)
+summary(fit.cubic.spline)
+
+f_x <- function(x) betas[1]*1 + betas[2]*x + betas[3]*xˆ2 + betas[4]*xˆ3 +
+betas[5]*(x - eta1)ˆ3*(x > eta1) + betas[6]*(x - eta2)ˆ3*(x > eta2)
+#for instance:
+f_x(50)
+
+scatplot +
+geom_function(fun = f_x, col="blue", size=1.5, alpha=0.7) +
+geom_vline(xintercept=eta1, col="green") +
+geom_vline(xintercept=eta2, col="green")
+```
+
+Natural Cubic Regression Spline:
+```{r}
+ns_basis = ns(animals$gestation, knots = c(eta1, eta2, eta3, eta4))
+newGestation = seq(0, 680, length.out=200)
+SplineMatrix = predict(ns_basis, newGestation) #to plot the spline basis functions
+round(head(SplineMatrix,10),3)
+
+plotSplineBasis = natural_spline_long = pivot_longer(as.data.frame(cbind(newGestation, SplineMatrix)), cols=c(2,3,4,5,6), names_to = "SplineBasis")
+ggplot(data=plotSplineBasis,
+aes(
+x=newGestation,
+y=value,
+color=SplineBasis
+)) +
+geom_line(size=1) +
+geom_vline(xintercept=min(animals$gestation), col="darkgreen") +
+geom_vline(xintercept=eta1, col="darkgreen") +
+geom_vline(xintercept=eta2, col="darkgreen") +
+geom_vline(xintercept=eta3, col="darkgreen") +
+geom_vline(xintercept=eta4, col="darkgreen") +
+geom_vline(xintercept=max(animals$gestation), col="darkgreen")
+fit.ncs <- lm(longevity ~ ns(gestation, knots = c(eta1, eta2, eta3, eta4)), data=animals)
+summary(fit.ncs)
+
+ncs.fit <- predict(fit.ncs, newdata=data.frame(gestation=newGestation))
+ggplot(data=animals,
+aes(x=gestation,
+y=longevity
+)
+) +
+geom_point(pch=21, fill="red", size=4, alpha=0.5) +
+labs(x="Gestational Period (Days)",
+y="Longevity (Years)",
+title="Natural Cubic Spline") +
+geom_line(
+data = data.frame(
+x = newGestation,
+y = ncs.fit
+),
+aes(
+x=x,
+y=y
+),
+color = "blue", size = 1
+) +
+geom_vline(xintercept=min(animals$gestation), col="darkgreen") +
+geom_vline(xintercept=eta1, col="darkgreen") +
+geom_vline(xintercept=eta2, col="darkgreen") +
+geom_vline(xintercept=eta3, col="darkgreen") +
+geom_vline(xintercept=eta4, col="darkgreen") +
+geom_vline(xintercept=max(animals$gestation), col="darkgreen")
+```
+
+
+Smoothing Spline:
+```{r}
+f_smoothing_spline = smooth.spline(animals$gestation, animals$longevity, df=6)
+estimated_f = predict(f_smoothing_spline, newGestation) #to plot the spline basis functions
+ggplot(data=animals,
+aes(x=gestation,
+y=longevity
+)
+) +
+geom_point(pch=21, fill="red", size=4, alpha=0.5) +
+labs(x="Gestational Period (Days)",
+y="Longevity (Years)",
+title="Smoothing Spline (df=6)") +
+geom_line(
+data = data.frame(
+x = newGestation,
+y = estimated_f$y
+),
+aes(
+x=x,
+y=y
+),
+color = "blue", size = 1,
+inherit.aes = FALSE
+)
+
+f_smoothing_spline = smooth.spline(animals$gestation, animals$longevity, df=3)
+estimated_f = predict(f_smoothing_spline, newGestation) #to plot the spline basis functions
+ggplot(data=animals,
+aes(x=gestation,
+y=longevity
+)
+) +
+geom_point(pch=21, fill="red", size=4, alpha=0.5) +
+labs(x="Gestational Period (Days)",
+y="Longevity (Years)",
+title="Smoothing Spline (df=3)") +
+geom_line(
+data = data.frame(
+x = newGestation,
+y = estimated_f$y
+),
+aes(
+x=x,
+y=y
+),
+color = "blue", size = 1,
+inherit.aes = FALSE
+)
+```
+
+
+## b. Multiple Testing and the Bonferroni Correction
+
+Read Chapter 13, up to the Bonferroni Method in Section 13.3.2.
+
+Then, complete Exercise 4, parts (a) and (b) only!
+
+### Exercise 4 (a)
+
+Suppose we test m = 10 hypotheses, and obtain the p-values shown in Table 13.4.
+
+Suppose that we wish to control the Type I error for each null hypothesis at level α =0.05. Which null hypotheses will we reject?
+
+**Answer:**
+
+```{r}
+
+```
+
+
+### Exervise 4 (b)
+
+Now suppose that we wish to control the FWER at level α = 0.05. Which null hypotheses will we reject? Justify your answer.
+
+**Answer:**
+
+```{r}
+
+```
+

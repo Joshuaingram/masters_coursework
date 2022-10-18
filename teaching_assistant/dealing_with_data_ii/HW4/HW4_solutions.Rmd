@@ -1,0 +1,57 @@
+---
+title: "Dealing with Data II Homework 4 Solutions"
+author: "Joshua D. Ingram"
+date: "2022-10-14"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(tidy=TRUE)
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60))
+knitr::opts_chunk$set(fig.height=4, fig.width=6)
+```
+
+# Reading from the textbook
+
+## a. Chapter 7: On the Normal Distribution and working with it
+
+- Section 7.2
+
+## b. Chapter 12: More on the population regression model, and confidence intervals for the slope and presdiction intervals
+
+- Section 12.1: Review, but with the key definition of the Population Regression Model on page 636
+- Seciton 12.2: Inference about the slope beta (Hypothesis test and confidence interval)
+- Section 12.3: skip!
+- Section 12.3: Standardized Residuals, Confidence Interval for the mean response. Skip the last few page about the ANOVA table.
+
+# Reading the R Handout
+
+## a. Read Sections 5 an 6 of the R handout: "Scatterplots and Linear Regression" posted under Files -> R Handouts 
+
+# Problems
+
+## 1. Old Faithful (continued from last HW)
+
+The Old Faithful dataset (available in R by typing faithful in the R prompt, e.g., > faithful) is a dataset about the duration of
+an eruption of that famous geyser (e.g., 3.6 minutes for the first observation in the dataset) and the
+waiting time to the next eruption (called "waiting", e.g., 79 minutes for the first observation).
+
+### h. Construct a 95% confidence interval for the slope and interpret it in context.
+
+
+
+### i. Construct a 95% confidence interval for the predicted (or mean) waiting time, for eruptions that last 4.5 minutes.
+
+
+
+## 2. Textbok Exerise 12.22 - b.
+
+Instead of using the web app, download the data and find the p-value for the hypothesis test and the confidence interval in R.
+
+## 3. Textbook Exercise 12.52 - a.
+
+This refers to the same dataset. Use R to obtain the confidence interval asked for in part a, and interpret.
+
+x
+
