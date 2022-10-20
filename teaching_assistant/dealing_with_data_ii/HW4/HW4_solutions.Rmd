@@ -27,7 +27,7 @@ knitr::opts_chunk$set(fig.height=4, fig.width=6)
 
 # Reading the R Handout
 
-## a. Read Sections 5 an 6 of the R handout: "Scatterplots and Linear Regression" posted under Files -> R Handouts 
+## a. Read Sections 5 and 6 of the R handout: "Scatterplots and Linear Regression" posted under Files -> R Handouts 
 
 # Problems
 
@@ -37,21 +37,103 @@ The Old Faithful dataset (available in R by typing faithful in the R prompt, e.g
 an eruption of that famous geyser (e.g., 3.6 minutes for the first observation in the dataset) and the
 waiting time to the next eruption (called "waiting", e.g., 79 minutes for the first observation).
 
+```{r}
+fit <- lm(waiting ~ eruptions, data = faithful)
+summary(fit)
+```
+
 ### h. Construct a 95% confidence interval for the slope and interpret it in context.
 
+**Answer:**
 
+```{r}
+# c.i. = b +/ margin of error
+confint <- c(10.7296 -  (1.96 * 0.3148), 10.7296 + (1.96 * 0.3148))
+confint
+```
+
+With 95% confidence, we predict that for every 1 minute increase in the eruption time, we expect the waiting time for the next eruption to increase by between 10.11259 and 11.34661 minutes, with a point estimate of a 10.7296 minute increase.ß
 
 ### i. Construct a 95% confidence interval for the predicted (or mean) waiting time, for eruptions that last 4.5 minutes.
 
+**Answer:**
 
+```{r}
+predict(fit, newdata = data.frame(eruptions = 4.5), se = TRUE)
+```
+
+```{r}
+confint <- c(81.75778 - 1.96 * 0.4796786, 81.75778 + 1.96 * 0.4796786)
+confint
+```
+
+With 95% confidence, we predict that the average waiting time between eruptions with an eruption time of 4.5 minutes is between 80.81761 and 82.69795 minutes, with a point estimate of 81.75778 minutes. 
 
 ## 2. Textbok Exerise 12.22 - b.
 
+Refer to the cell phone data set from Exercise 12.9 about various specs of cell phones, which is preloaded in the *Linear Regression* app. Treat the weight of the phone as the response and the capacity of the battery as the explanatory variable. Remove the outlier (phone no. 70). 
+
+b. Confirm, using the output of the *Linear Regression* app or other software, that the 95% confidence interval for the population slope equals (0.028, 0.060). Interpret the interval and explain the correspondence with the result of the significance test in part a.
+
 Instead of using the web app, download the data and find the p-value for the hypothesis test and the confidence interval in R.
+
+**Answer:**
+
+```{r}
+library(readr)
+cell <- read_csv("https://img1.wsimg.com/blobby/go/bbca5dba-4947-4587-b40a-db346c01b1b3/downloads/CellphoneSpecs.csv")
+# remove cell phone number 70 from the data
+cell <- cell[-which(cell$Phone == 70),]
+cell$capacity <- cell$`Battery_Capacity(mAh)`
+```
+
+```{r}
+fit <- lm(`Weight(g)` ~ capacity, data = cell)
+summary(fit)
+```
+
+Our null and alternative hyptheses for our hypothesis test are as follows (with a significance level of $\alpha = 0.05$):
+
+$$
+H_0: \beta = 0
+$$
+
+$$
+H_A : \beta \neq = 0
+$$
+
+From the `summary(fit)` function, we see we obtain a t-statistic of 5.407 for the slope, which corresponds to a p-value of 7.12e-07. This p-value is below our significance level, so we reject the null hypothesis and have evidence that $\beta \neq 0$. Our 95% confidence interval does not contain 0, which agrees with our hypothesis test, and is given by:
+
+```{r}
+c(0.043568  - 1.96 * 0.008057 , 0.043568  + 1.96 * 0.008057 )
+```
+
+With 95% confidence, we predict that for every 1 mAh increase in battery capacity, we expect that the weight of a phone to increase by between 0.0278 and 0.0594 grams, with a point estimate of 0.0436 grams.
 
 ## 3. Textbook Exercise 12.52 - a.
 
+Refer to the cell phone specs data file on the book's website, which is also preloaded in the *Linear Regression* app. Regress y = weight on x = capacity of battery, excluding the outlier (phone no. 70).
+
+a. Stating the necessary assumptions, find a 95% confidence interval for the mean weight of cell phones with a battery capacity of 1500 mAh. Interpret the interval. 
+
 This refers to the same dataset. Use R to obtain the confidence interval asked for in part a, and interpret.
 
-x
+**Answer:**
 
+The necessary assumptions for making these inferences are the following:
+
+1. Relationship in population satisfies the regression model (linear)
+2. Data gathered randomly
+3. Population y values at each x value have a normal distribution
+4. Response has the same variance at each x value
+
+```{r}
+predict(fit, newdata = data.frame(capacity = 1500), se = TRUE)
+```
+
+```{r}
+# confidence interval
+c(132.0103 - 1.96 * 2.716695, 132.0103 + 1.96 * 2.716695)
+```
+
+With 95% confidence, we predict that the average phone weight with a battery capacity of 1500 mAh is between 126.6856 and 137.335 grams, with a point estimate of 132.0103 grams.
