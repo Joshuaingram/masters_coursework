@@ -1,0 +1,44 @@
+---
+title: "Data Munging Assignment 1 - Data Quality Measurement"
+author: "Joshua D. Ingram"
+date: "2022-11-02"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Question 1
+
+Create a function to measure two of the dimensions of data quality described by Pipino, Lee, and Wang. Not all will be easily quantified, and the method of quantification is up to you. The function should accept a data frame as input and return scores for both of your data quality measures for each column.
+
+When submitting R code, include comments and follow a consistent style, perhaps this one (https://style.tidyverse.org/), which can be applied with the lintr package.
+
+You can work in groups of up to two; if so, note group members in the submitted file, which can be a .R or .Rmd script or compiled .pdf or .html file. Submissions can be made via Canvas or email to the instructor. Questions welcome.
+
+## Answer
+
+```{r}
+# measure_quality
+# input: df - dataframe of data, n_needed - integer for number of data needed in each column
+# returns: dataframe of scores of completeness and appropriate amount for eaech column (metrics from 0 to 1)
+measure_quality <- function(df, n_needed = nrow(df)){
+  
+  # get the proportion of non-NA values for each column in the dataframe
+  # This is the metric given on page 3 for completeness
+  completeness <- 1 - sapply(as.data.frame(sapply(df, is.na)), mean)
+  
+  # metric for the appropriate amount of data, definition given on page 4
+  # do not include NAs in lengths of each column
+  ratio1 <- sapply(df, function(x){sum(!is.na(x))})/n_needed
+  ratio2 <- n_needed/sapply(df, function(x){sum(!is.na(x))})
+  appropriate_amnt <- pmin(ratio1, ratio2)
+  
+  scores <- data.frame(attribute = colnames(df), completeness, appropriate_amnt)
+  row.names(scores) <- NULL
+  
+  return(scores)
+}
+```
+

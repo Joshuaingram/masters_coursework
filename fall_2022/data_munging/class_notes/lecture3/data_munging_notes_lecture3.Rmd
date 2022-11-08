@@ -1,0 +1,15 @@
+---
+title: "Data Munging Class Notes - Lecture 2"
+author: "Joshua D. Ingram"
+date: "2022-10-31"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Combined Data Formats
+
+
+

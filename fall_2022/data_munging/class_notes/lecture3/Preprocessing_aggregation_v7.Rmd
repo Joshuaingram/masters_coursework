@@ -1,0 +1,422 @@
+---
+title: "Preprocessing I"
+subtitle: "Aggregation and transformation"
+author: "Tyrone Ryba"
+date: '`r format(Sys.time(), "Last modified: %d %b %Y")`'
+output:
+  pdf_document:
+    latex_engine: xelatex
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+  html_notebook:
+    toc: yes
+    toc_float: yes
+    theme: flatly
+    df_print: paged
+  bookdown::gitbook:
+    self_contained: true
+    split_by: none
+    sharing: null
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme: flatly
+    df_print: paged
+  word_document: default
+editor_options: 
+  # chunk_output_type: inline
+  chunk_output_type: console
+---
+
+```{r, include=FALSE}
+
+# setwd("D:/Datasets")
+# bookdown::render_book("Preprocessing_aggregation.Rmd", output_format =   "bookdown::gitbook", new_session = FALSE, fig_caption = TRUE)
+library(bookdown)
+
+```
+
+
+# Aggregation/data collection
+
+This week we will focus on methods to collect datasets from a variety of sources and formats, read those into R, and begin transforming them into structures amenable to analysis.
+
+## Read from local file
+
+Reading from a local file is straightforward in R. By default, files will be read from (and written to) the working directory, which is get and set using getwd() and setwd() respectively.
+
+```{r, eval=TRUE}
+# getwd()
+  
+project.dir <- "D:/Project"
+dataset.dir <- "Datasets"
+outputs.dir <- "Output"
+scripts.dir <- "Scripts"
+  
+# setwd(project.dir)
+
+# If in /Scripts
+# read.table("../Datasets/File1.txt")
+    
+```
+
+To avoid changing the working directory when reading in files from new locations, we can read or write files from file paths constructed from the file.path() function. This also helps to translate machine-specific path formats into a more compatible standard format. 
+
+```{r}
+
+file.path(project.dir, dataset.dir)
+file.path(project.dir, outputs.dir)
+
+```
+
+### read.table, read.csv, read.delim, etc.
+
+Most small, flat tables can be read with the read.x family of base R functions. These share common parameters and defaults, where the most important arguments include the filename, number of rows skipped and number read, and column types (if known).
+
+For reading in large tables using base R, there are some helpful tips in read.table()'s help file.  See ?read.table.
+
+In general, whenever possible, specify the type and size of the object in advance, then fill in the object slots later. For example, when importing text, it is much faster and more memory-efficient to specify the amount and types of data to be read first by including the nrows and colClasses arguments -- this allows the right amount of memory to be reserved for the object and avoids inefficient methods for growing arrays. We might encapsulate that in a function for convenience:
+
+```{r}
+
+# gds <- read.delim("GDS5093_full.txt", skip=323)
+# gds <- read.delim(file.path(project.dir, dataset.dir, "GDS5093_full.txt"), skip=323)
+
+# Generic function for reading in tabular text datasets
+# with column names in the first row
+readDataset <- function(filename, rowNum, classes=NULL, ...) {
+    tab5rows  <- read.delim(filename, header = TRUE, nrows = 1000, ...)
+    if(is.null(classes)) 
+       classes <- sapply(tab5rows, class)
+    classes[classes == "logical"] <- "character"
+    dataset <- read.delim(
+        filename,
+        header = TRUE ,
+        nrows = rowNum,
+        comment.char = "",
+        colClasses = classes,
+        ...
+    )
+}
+
+# yourDataset <- readDataset("Somefile.txt", rowNum=730e3)
+gds.test <- readDataset("GDS5093_full.txt", rowNum = 55000, skip = 323)
+
+# Here, "skip" wasn't an explicit argument to read.delim.  How did it reach the two read.delim functions?
+
+```
+
+### fread
+
+The data.table package contains a special function for reading large files called fread() (for fast read). This is usually a convenient choice for any tab- or comma-delimited file larger than 100-200 MB. 
+
+```{r, eval=FALSE}
+
+# install.packages('data.table')
+library(data.table)
+gds.dt <- fread("GDS5093_full.txt", skip = 323)
+str(gds.dt)
+
+```
+
+### read_table
+
+For work in the tidyverse, which we transition to later, the readr package's read_table function will be a natural choice. This is faster for most applications than read.delim and with logical defaults.  
+
+```{r, eval=FALSE}
+
+# install.packages('readr')
+library(readr)
+gds.rd <- read_table("GDS5093_full.txt", skip = 323)
+
+```
+
+Both fread and read_table have side effects in the class of the stored object -- a data.frame and data.table for fread, or a data.frame and tibble for read_delim. Some functions will work on these as data frames without issue, and others, like the subsetting operator [, may require with=FALSE, as.data.frame, or other adaptations.
+
+
+## Performance of file reading methods 
+
+**Try profiling the performance of reading data:  
+1. Using read.table() or read.delim() with default parameters  
+2. Using the readDatasets() function to specify column data types and row lengths  
+3. Using the fread() function from the data.table package.  
+Use system.time() or Rprof() to measure the time elapsed, as below.**  
+
+```{r}
+
+# See:
+# ?system.time()
+# ?Rprof()         
+# ?summaryRprof()
+library(data.table)
+
+system.time(for(i in 1:1e7) {})
+
+Rprof()
+
+gds.dt <- fread("GDS5093_full.txt", skip = 323)
+
+Rprof(NULL)
+summaryRprof()
+
+```
+
+We will talk more about optimization later, but see the lineprof package and Hadley Wickham's discussion of code profiling here: https://adv-r.hadley.nz/perf-measure.html
+
+In some cases, R packages maintain databases that can be queried from local files.  An example of this is the refGenome package, which provides objects for storing genome assembly and annotation data. 
+
+(This is an archived package from CRAN, so would need to be installed from local archive files or with R developer tools and install_version. See https://stackoverflow.com/questions/24194409/ for details.)
+
+```{r, eval=FALSE}
+
+# install.packages("refGenome")  # Now archived.
+# devtools::install_version("refGenome", version="1.7.7")
+# library(refGenome)
+
+# # From refGenome package
+# Ens_file  <- system.file("extdata", "hs.ensembl.62.small.RData", package="refGenome")
+# Ens_gen   <- loadGenome(Ens_file)
+# Ens_junc  <- getSpliceTable(Ens_gen)
+# Ens_gene  <- getGenePositions(Ens_junc)
+# Ens_gen
+
+```
+
+##  Read from remote files
+
+R can also read from remote files. The most common way to do this is to use a URL in a reading function like read.table or fread. For this, we will download a record from The Cancer Genome Atlas (TCGA), which houses a comprehensive collection of genomic datasets from a wide variety of cancer types.  The data are stored in two tiers, with one containing open access data freely available, and another controlled access data with potentially identifiable information. 
+
+**Read the patients annotation table, nationwidechildrens.org_clinical_patient_hnsc.txt, into a variable called patn.df.**
+
+```{r, eval=FALSE}
+
+# First, try read.delim() on the following URL:
+# http://people.csail.mit.edu/yueli/tcga/clin/nationwidechildrens.org_clinical_patient_hnsc.txt
+
+data.url <- "https://people.csail.mit.edu/yueli/tcga/clin/nationwidechildrens.org_clinical_patient_hnsc.txt"
+patn.df <- read.delim(data.url)
+# patn.df <- fread(data.url)
+# patn.df <- read_delim(data.url)
+
+```
+
+Did this work?  We can check the properties of newly read datasets with a variety of methods, but as before str() and View() are useful for a first look:
+
+```{r, eval=FALSE}
+
+str(patn.df)
+View(patn.df)
+
+```
+
+It appears there is one formatting issue to correct here before moving on.  How should we do so?
+
+
+## Read from the clipboard
+
+For quick plots or tables, R can read from and write to the clipboard:
+
+```{r, eval=FALSE}
+
+cor(mtcars)
+
+write.table(cor(mtcars), file="clipboard", sep="\t")
+write.table(cor(mtcars), file="test.txt", sep="\t")
+write.table(cor(mtcars), file="clipboard", row.names=FALSE, quote=FALSE, sep="\t")
+
+read.delim(file="clipboard", header=TRUE)
+write.table(Ens_gen@ev$genes, file="clipboard", row.names=FALSE, quote=FALSE, sep="\t")
+# From here, data can be pasted into a spreadsheet, text editor, etc.
+
+# More descriptive, though works with character strings:
+# ?readClipboard()
+# ?writeClipboard()
+
+```
+
+A common issue is that the clipboard will be just short of the memory needed. Try "clipboard-128" or "clipboard-256" if so. On Linux this generally requires a workaround with xclip or a similar package as described here: https://stackoverflow.com/questions/10959521. 
+
+```{r}
+
+# write.table(1:10, pipe("xclip -i", "w"))
+
+```
+
+For working with commands for transforming data today, we will use data from a [dataset on patients with chronic kidney disease](https://archive.ics.uci.edu/ml/datasets/Chronic_Kidney_Disease), available at the UCI Machine Learning Archive: http://archive.ics.uci.edu/ml/. 
+
+The original files are in .arff format (Attribute-Relation File Format), which is from a machine learning package called Weka. To read these, we can use read.arff(), which is in the foreign package, now installed by default. We can work on a comma-separated version to focus on import and reformatting for today. 
+
+(More generally, see ls("package:foreign") or autocomplete "foreign::" for some other built-in functions to read from and write to other common statistical packages, like read.spss (SPSS), read.xport (SAS), etc.)
+
+```{r}
+
+# library(foreign)
+# ckd.arff <- read.arff("chronic_kidney_disease.arff")
+ 
+ckd.df <- read.delim("chronic_kidney_disease.csv")
+ckd.df <- read.csv("chronic_kidney_disease.csv")  # First version
+str(ckd.df)
+# ?read.csv
+
+ckd.df <- read.csv("chronic_kidney_disease.csv")
+str(ckd.df)
+
+```
+
+Did this work correctly?  Check str(ckd.df).
+It seems the flag for missing values did not properly convert. How to fix this? See ?read.csv. 
+
+
+# Transformation
+
+## Aggregation by factor level
+
+There will be many times where we need to perform a calculation on each of the unique levels of a factor, and return the result. We will spend some time with a set of packages by Hadley Wickham (tidyr, plyr, dplyr, and reshape2) designed for this, but there are also useful methods in base R.  One of these is aggregate().
+
+```{r}
+
+aggregate(Petal.Width ~ Species, iris, sum)
+aggregate(Petal.Length ~ Species, iris, sum)
+aggregate(wt ~ cyl + am, mtcars, median)
+
+# What is the sample size for each factor combination?
+# For this we can use table().
+table(mtcars$cyl, mtcars$am)
+summary(as.factor(mtcars$cyl))
+
+```
+
+Here, we collected the total and petal width and length for each level of species in the iris dataset.  For mtcars, we found the number of entries with each unique combination of gear and cylinder number.
+
+The next section covers an extension of this: creating new features or factor levels based on the distribution of values in one column.
+
+**Practice using aggregate: Collect the average miles per gallon (mpg) in the mtcars dataset as a function of number of cylinders (cyl), gears (gear) and transmission type (am).**
+
+```{r}
+
+
+
+```
+
+A closely related and equally useful function for tabulating the numbers of values in individual or combined categories (factor variables) is table(). The output is made clearer by assigning labels to table rows and columns.
+
+```{r}
+
+# Single-factor table
+table(iris$Species)
+
+# Two-factor table; label margins for clarity
+table(Cylinders=mtcars$cyl, Gears=mtcars$gear) 
+
+```
+
+**Practice using table: How does the distribution of normal versus abnormal red blood cell counts compare between patients with or without chronic kidney disease in the ckd.df dataset read above?**
+
+```{r}
+
+
+
+```
+
+
+## Constructing new features
+
+The features most useful for analysis will often need to be constructed from some combination of other variables. For example, there are significant relationships between heart disease and diabetes progression that may make other values in the chronic kidney disease dataset easier to predict. In this case, we would like to construct a feature that records one of four states, depending on the combined states of diabetes mellitus (dm) and coronary artery disease (cad). 
+
+**Create a new feature in the chronic diabetes dataset, called class_cad_dm, that creates an overall category from the combination of cad and dm variables.**
+
+```{r, include=TRUE, eval=FALSE}
+
+# Check first rows
+head(ckd.df)
+
+# Combine features - see ?paste / paste0
+ckd.df$class_cad_dm <- paste(ckd.df$cad, ckd.df$dm, sep = "_")
+
+# How many observations are in each combined category?
+summary(as.factor(ckd.df$class_cad_dm))
+
+```
+
+## Discretization
+
+Generally, discretization is the process of creating a discrete or categorical variable from the values of a continuous one. These might be created from intervals of equal distances or equal numbers of values along the variable's range, or by specialized methods for classification problems. Discretization is often useful or necessary for applying certain algorithms in machine learning. 
+
+### Interval-based
+
+The simplest way to discretize is to create a series of bins with equally spaced breakpoints chosen in advance, and collect the number of values that fall into each bin.  
+
+**Create a new categorical variable, wbcc_rng, that contains equally spaced bins along the range of white blood cell count (wbcc) values.**
+
+```{r}
+
+# See ?cut / ?seq
+# ?cut
+
+
+
+```
+
+### Equal frequency / depth
+
+Equal frequency bins have the benefit of balancing the amount of information contained among observations in each category. These can be created similarly, here using quantile() to find breakpoints.
+
+**Create a new categorical variable, wbcc_num, that contains an equal number of observations in each of ten age categories.**
+
+```{r, eval=FALSE}
+
+# Create category; split wbcc by decile age groups
+ckd.df$age_cat <- cut(ckd.df$age, breaks=quantile(ckd.df$age, probs=seq(from=0, to=1, by=0.10), na.rm=TRUE))
+wbcc_num <- split(ckd.df$wbcc, ckd.df$age_cat)
+
+# Check distribution
+summary(wbcc_num)
+
+# An intuitive way to see where these fall in the distribution
+# is with plot(density()) and rug() or abline(v=...):
+
+# What edit is needed?
+plot(density(ckd.df$wbcc, na.rm=TRUE))
+
+```
+
+### Entropy-based
+
+Discretization can also be done in a supervised fashion, and in such a way that the least information is lost -- for instance, by using bins that minimize the loss in relationship between variables in the dataset.
+
+These methods can be applied through the discretization package.
+
+**Using discretize, find bins that minimize entropy in a column in the TCGA patients dataset or the chronic kidney disease dataset**. 
+
+```{r}
+# install.packages("discretization")
+library("discretization")
+
+# ?discretization::disc.Topdown()
+
+disc.Topdown(mtcars)
+str(disc.Topdown(mtcars))
+
+plot(mtcars, col=mtcars$cyl)
+plot(disc.Topdown(mtcars)$Disc.data, col=mtcars$cyl, pch=19)
+
+```
+
+### Segmentation methods
+
+For some projects, the categories we would like to use are not naturally encoded as intervals in the distribution, but can be extracted from abrupt changes in space or time. One example is the segmentation of copy number variants along the genome. Another would be segmentation of a time series of stock performance. There are now many methods to do this. For the former, packages like DNACopy, which performs the circular binary segmentation (CBS) algorithm of Olshen and Venkatraman, is a good choice. Methods can be found in the documentation in Bioconductor: http://www.bioconductor.org/packages/release/bioc/html/DNAcopy.html. For more general change point detection we will work with the changepoint package, which is simpler to apply. We will look at this next time.
+
+
+
+
+
+
+
+
+
+
+
+
+
+

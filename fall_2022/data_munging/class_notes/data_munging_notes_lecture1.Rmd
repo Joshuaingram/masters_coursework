@@ -1,0 +1,16 @@
+---
+title: "Data Munging Class Notes - Lecture 1"
+author: "Joshua D. Ingram"
+date: "2022-10-26"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# R Primer Part 1
+
+
+
+# R Primer Part 2

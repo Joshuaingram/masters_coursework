@@ -1,0 +1,35 @@
+---
+title: "Data Munging Class Notes - Lecture 2"
+author: "Joshua D. Ingram"
+date: "2022-10-31"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data Collection
+
+## Considerations
+
+A. Data Size
+  1. How much is needed? - Power Analysis
+  2. Dimensionality
+B. Collection Strategies
+  1. Complete dataset
+  2. Sample from complete dataset
+  3. Sample from data stream
+C. Data use agreements
+  1. Medical data (HIPAA regulations)
+  2. Private collaborations
+  3. Proprietary business data (MOUs)
+  
+# Assessing Data Quality
+
+## Metrics
+
+- Qualitative
+- Quantitative
+
+
