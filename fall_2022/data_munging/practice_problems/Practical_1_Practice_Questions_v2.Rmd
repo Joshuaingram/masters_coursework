@@ -1,0 +1,295 @@
+---
+title: "Practical Exam I"
+linkcolor: red
+output:
+  html_document:
+    toc: yes
+  pdf_document:
+    latex_engine: xelatex
+    number_sections: no
+    toc: no
+    toc_depth: 4
+fontsize: 11pt
+urlcolor: red
+---
+\bigskip
+\bigskip
+\bigskip
+
+
+### 1. Write statement(s) to collect the maximum value of each column in the morley dataset (?morley):
+
+```{r}
+sapply(morley, max)
+```
+
+
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+
+### 2. Describe or show a way in which working directories in project folders can be made portable across machines. 
+
+```{r, eval=TRUE}
+project.dir <- "D:/Project"
+dataset.dir <- "Datasets"
+outputs.dir <- "Output"
+scripts.dir <- "Scripts"
+data_path <- paste(project.dir, dataset.dir)
+read.csv(data_path)
+```
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+### 3. Create scatterplots for every pairwise combination of columns in the mtcars dataset.
+
+```{r}
+plot(mtcars)
+```
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+### 4. The rivers dataset (?rivers) describes the length in miles of 141 major rivers in North America. Isolate values of the rivers dataset that are either between 543 and 1283 miles, or between 1604 and 2406 miles, and store these in a new variable.
+
+```{r, eval=FALSE}
+
+subset <- rivers[rivers >= 543 & rivers <= 1283 | rivers >= 1605 & rivers <= 2406]
+subset
+
+```
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+### 5. From the data structure comb.list, collect values of horsepower (hp) in mtcars where engine weights (wt, x1000 lbs) are between 3000 and 4000 pounds, but only for cars with four gears.
+
+```{r, eval=FALSE}
+  
+comb.list <- list(iris=iris, mtcars=mtcars, anscombe=anscombe)
+
+comb.list$mtcars[which(mtcars$gear == 4 & mtcars$wt >= 3 & mtcars$wt <= 4),]
+  
+```
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+### 6. Write a for loop or while loop that prints a message to the console for each row of a given numeric data column.  If the value in the current row is within the interquartile range of the column as a whole (see ?IQR), print "Within IQR". If not, print "Outside IQR".  
+
+```{r}
+data <- faithful$eruptions
+
+for (i in 1:length(data)){
+  ifelse(data[i] <= quantile(data, 0.75) & data[i] >= quantile(data, 0.25), 
+         print(paste(data[i], "Within IQR.")), 
+         print(paste(data[i], "Outside IQR.")))
+  
+}
+  
+```
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+### 7. Write statement(s) to collect the sum of each numeric column in the iris dataset:
+
+```{r}
+library(dplyr)
+sapply(select_if(iris, is.numeric), sum)
+
+```
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+### 8. Write a for loop or while loop that creates a sum of any number that is a multiple of three, in the range 1:100. If possible, also do the same without a loop. 
+
+```{r}
+sum = 0
+for (i in 1:100){
+  if (i%%3 == 0){
+    sum = sum + i
+  }
+}
+sum
+sum(seq(3, 100, 3))
+```
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+### 9. For the following matrix, write statement(s) to add 3.0 to each value in x for the cells in rows 3 to 7 and columns 2 to 8.  
+
+```{r}
+  
+x <- matrix(1:100, nrow=10, ncol=10)
+
+x[3:7, 2:8] <- x[3:7, 2:8] + 3
+x
+  
+```
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+
+### 10. Add a new column to the PlantGrowth dataset with values of "heavy" for plants above the average weight and "light" for plants below the mean. Brevity counts. 
+
+```{r}
+
+PlantGrowth %>%
+  mutate(weight_cat = ifelse(weight > mean(weight), "heavy", "light"))
+
+```
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+### 11. Create a function that takes three variables as input.  It should print the structure of the first, create a scatterplot of the second (two columns to plot should be selectable by the user), and create a summary of the third. Ideally, the function will also return an object that contains all three variables.
+
+```{r}
+
+myfun <- function(df1, df2, df3, col1=1, col2=2){
+  
+  print(str(df1))
+  scatter(df2[,col1], df2[,col1])
+  summary(df3)
+  
+  return(df1, df2, df3)
+}
+
+```
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+### 12. The data entered in "Standardization_example.txt" on Canvas have several problems with non-standard capitalization, values, and formatting. Apply methods to standardize as many entries as possible.
+
+```{r}
+
+stand_df <- read.delim(file="Standardization_example.txt", header=TRUE)
+
+```
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+### 13. The dataset loaded below contains gene expression data from medullary breast cancers from Sabatier et al., 2011 (GEO record GSE21653) From the structure of the object or relevant functions, extract any rows of the phenotype data frame (phenoData) where the 'characteristics_ch1.12' column equals 'molecular subtype: Basal'. Bonus: Does there appear to be a difference in the rate of p53 immunohistochemical staining ('p53 ihc:ch1') between 'Basal' and 'LuminalA' cases?
+
+```{r, eval=FALSE}
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("GEOquery")
+
+# This should be sufficient for most R installations, but 
+# required packages may need to be installed manually if
+# noted in installation errors.
+# install.packages('requiredPackage')
+
+library(GEOquery)
+
+# Data were collected from the Gene Expression Omnibus like so:
+# gse <- getGEO("GSE21653", GSEMatrix = TRUE)
+# saveRDS(gse, file = "GSE_21653_example.rds")
+
+# First, ensure that "GSE_21653_example.rds" is in the working directory
+dir()
+
+# If not, change the working directory to one with the file:
+# setwd("C:/Datasets")
+
+gse <- readRDS(file="GSE_21653_example.rds")
+str(gse)
+
+# From this structure, we first need the first list element
+# (the top of str output notes it is a 'List of 1'):
+gse[[1]]
+
+# From here, we need 'phenoData', which is at the second level
+# of the hierarchy.  From str(gse), we address this with @:
+gse[[1]]@phenoData
+
+# Note the autocompletion if using Rstudio or some other IDEs.
+# We continue down the structure to collect 'characteristics_ch1.12'
+gse[[1]]@phenoData@data$characteristics_ch1.12
+
+# We collect T/F indices of rows that match 'molecular subtype: Basal'
+row.ind <- gse[[1]]@phenoData@data$characteristics_ch1.12 == 'molecular subtype: Basal'
+summary(row.ind)
+
+# Finally, we use these as row indices to the phenotype table phenoData.
+gse[[1]]@phenoData@data[row.ind, ]
+summary(apply(gse[[1]]@phenoData@data[row.ind, ], 2, as.factor))
+
+# More commonly we can use accessor functions to simplify, 
+# but these may not be available for all data in an object
+# or may leave out metadata.
+phenoData(gse[[1]])
+pData(gse[[1]])[1:10, 1:4]
+
+# Such nesting of indices can be intuitive to write but not to read,
+# so we will learn some alternatives with dplyr and related packages.
+
+```
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+
+
+
+
+
+
+
+
+
