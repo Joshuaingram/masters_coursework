@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
+.pkl
+.DS_Store

@@ -1,0 +1,188 @@
+---
+title: "Advanced Applied Statistics Homework 7 Solutions"
+date: "2022-11-22"
+output: pdf_document
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(tidy=TRUE)
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60))
+knitr::opts_chunk$set(fig.height=4, fig.width=6)
+```
+
+## 1. Logistic Regression
+
+Access the Washington Post dataset on murder crimes (available on Canvas), and fit a logistic regression model, using as response variable whether or not a case is closed. (Be careful, when I read in the data, everything was read in as a character vector. I had to turn variables like age into a numeric vector by using `as.numeric`. Also, you'll have to create the response variable from the existing variable called `disposition`, which has the three categories "Open/No arrest", "Closed without arrest", "Closed by arrest". Note: There are relatively few cases that are "Closed without arrest". If you want, instead of merging the two "Closed" categories, you can also filter out the ones that are "Closed without arrest", and just consider the binary response "Open/No arrest" versus "Closed by arrest".)
+
+  a. Make some preliminary plots, showing the distribution of the response variable, the distribution of the variable `sex`, and the distribution of the variable `age`.
+  
+```{r fig.width=5, fig.height=3}
+library(tidyverse)
+crime <- read_csv("/Users/joshuaingram/Main/Projects/masters_coursework/teaching_assistant/advanced_applied_statistics/HW7/WashingtonPostCrimeData.csv")
+crime
+crime %>% count(disposition)
+
+crime1 <- crime %>% 
+  mutate(disposition = factor(disposition, 
+                              levels=c("Open/No arrest", "Closed without arrest", "Closed by arrest"), ordered=TRUE),
+         disposition.binary = fct_collapse(disposition, "Open" = "Open/No arrest", "Closed" = c("Closed without arrest", "Closed by arrest")),
+         age = as.numeric(victim_age),
+         race = factor(victim_race),
+         sex = factor(victim_sex)
+  ) %>%
+  select("disposition.binary", "age", "race", "sex") %>%
+  drop_na()
+
+crime1
+
+
+crime1 %>% count(disposition.binary)
+crime1 %>% count(disposition.binary) %>% 
+  ggplot(aes(x=disposition.binary, y=100*n/sum(n), fill=disposition.binary)) + 
+    geom_bar(stat="identity", show.legend=FALSE) +
+    labs(x="Disposition",
+         y="Percent", 
+         title="Frequencies of Dispositions of Cases") +
+    theme_minimal() +
+  coord_flip()
+
+crime1 %>% count(sex) %>% 
+  ggplot(aes(x=sex, y=100*n/sum(n), fill=sex)) + 
+    geom_bar(stat="identity", show.legend=FALSE) +
+    labs(x="Sex",
+         y="Percent", 
+         title="Frequencies of Sex of Victim") +
+    theme_minimal() +
+  coord_flip()
+
+crime1 %>% count(sex, disposition.binary) %>% group_by(sex) %>% mutate(Proportion=n/sum(n))
+
+crime1 %>% count(sex, disposition.binary) %>% group_by(sex) %>% mutate(Proportion=n/sum(n)) %>%
+  ggplot(aes(x=sex, y=100*Proportion, fill=disposition.binary)) + 
+    geom_bar(stat="identity") +
+    labs(x="Sex",
+         y="Percent", 
+         title="Disposition by Sex of Victim") +
+    theme_minimal() +
+  coord_flip() +
+  theme(legend.position = "top") +
+  scale_fill_discrete(name="Disposition:", limits=c("Closed", "Open"))
+
+ggplot(data=crime1, aes(x=age)) +
+  geom_histogram(fill="lightblue") +
+  labs(x="Age",
+      y="Frequency", 
+      title="Distribution of Age of Victim") +
+  theme_minimal()
+```  
+  
+  
+  b. Fit a logistic regression model that includes age and sex (with categories female, male, unknown) of the victim. Explain (i.e., interpret) the coefficients for age and sex, and make a graph of the predicted probabilities, with age on the x-axis. 
+  
+```{r}
+fit <- glm(disposition.binary ~ age + sex, family=binomial(link="logit"), data=crime1)
+## Note You have to be extra careful what R considers a "success" when you didn't code it as numeric 0 or 1. From the help file: "For binomial families the response can also be specified as a factor (when the first level denotes failure and all others success)" Note that the first level of disposition.binary is "Open", so "Open" is considered a "Failure", and "Closed" is considered a success. This is really important for interpretation!!  
+summary(fit)
+exp(coefficients(fit))
+exp(10*0.0045229)
+```
+
+The estimated odds of a case being closed (as opposed to open) increases by 4.6% for every 10 years that a victim is older, controlling for the sex of the victim.
+
+For male victims, the estimated odds of a case being closed are about 60% lower compared to female victims. For victims of unknown sex, the estimated odds of a case being closed are about 35% lower compared to female victims.
+
+```{r}
+mygrid <- expand.grid(age = seq(0,90), sex=levels(crime1$sex)) #important to name variables age and sex, same as in glm call
+
+predictions <- predict(fit, newdata=mygrid, type="link", se.fit=TRUE)
+
+plotdata <- tibble(
+  age = mygrid$age,
+  sex = mygrid$sex,
+  log.odds = predictions$fit,
+  log.odds.LB = log.odds - 1.96*predictions$se.fit,
+  log.odds.UB = log.odds + 1.96*predictions$se.fit,
+  prob = exp(log.odds)/(1+exp(log.odds)),
+  prob.LB = exp(log.odds.LB)/(1+exp(log.odds.LB)),
+  prob.UB = exp(log.odds.UB)/(1+exp(log.odds.UB))
+)
+
+ggplot(data=plotdata, aes(x=age, y=log.odds, color=sex)) + 
+  geom_line(size=1) +
+  geom_ribbon(aes(ymin=log.odds.LB, ymax=log.odds.UB, fill=sex), color=NA, alpha=0.1) +
+  theme_bw() + 
+  labs(title="Washington Post Crime Data", x="Age of Victim", y="Log-odds of Case Being Closed")
+
+ggplot(data=plotdata, aes(x=age, y=prob, color=sex)) + 
+  geom_line(size=1) +
+  geom_ribbon(aes(ymin=prob.LB, ymax=prob.UB, fill=sex), color=NA, alpha=0.1) +
+  theme_bw() + 
+  labs(title="Washington Post Crime Data", x="Age of Victim", y="Probability of Case Being Closed")
+```
+
+  c. Report on the result of a statistical test that tests whether sex is needed in the model.
+  
+```{r}
+library(car)
+Anova(fit)
+```
+The likelihood ratio test for sex (likelihood ratio test statistic: 1213, df=2) has an extremely small P-value, indicating that sex is needed in the model.  
+
+  d. Fit the logistic regression model that includes the interaction between age and sex. Report on the result of a statistical test that tests whether this interaction is needed.
+
+```{r}
+fit1 <- glm(disposition.binary ~ age + sex + age*sex, family=binomial(link="logit"), data=crime1)
+summary(fit1)
+Anova(fit1)
+
+predictions <- predict(fit1, newdata=mygrid, type="link", se.fit=TRUE)
+
+plotdata <- tibble(
+  age = mygrid$age,
+  sex = mygrid$sex,
+  log.odds = predictions$fit,
+  log.odds.LB = log.odds - 1.96*predictions$se.fit,
+  log.odds.UB = log.odds + 1.96*predictions$se.fit,
+  prob = exp(log.odds)/(1+exp(log.odds)),
+  prob.LB = exp(log.odds.LB)/(1+exp(log.odds.LB)),
+  prob.UB = exp(log.odds.UB)/(1+exp(log.odds.UB))
+)
+
+ggplot(data=plotdata, aes(x=age, y=log.odds, color=sex)) + 
+  geom_line(size=1) +
+  geom_ribbon(aes(ymin=log.odds.LB, ymax=log.odds.UB, fill=sex), color=NA, alpha=0.1) +
+  theme_bw() + 
+  labs(title="Washington Post Crime Data", x="Age of Victim", y="Log-odds of Case Being Closed")
+
+ggplot(data=plotdata, aes(x=age, y=prob, color=sex)) + 
+  geom_line(size=1) +
+  geom_ribbon(aes(ymin=prob.LB, ymax=prob.UB, fill=sex), color=NA, alpha=0.1) +
+  theme_bw() + 
+  labs(title="Washington Post Crime Data", x="Age of Victim", y="Probability of Case Being Closed")
+```
+
+The likelihood ratio test for the age by sex interaction (likelihood ratio test statistic: 3.45, df=2) has P-value = 0.1779. There is no evidence of an age by sex interaction. 
+  
+  e. Plot the ROC curve and find the area under the curve for the model in part b.
+  
+```{r}
+library(caret)
+cutoff <- 0.50
+truth <- crime1$disposition.binary
+prediction <- factor(fitted(fit) > cutoff, labels = c("Open", "Closed"))
+summary(prediction)
+confus <- confusionMatrix(data = prediction, reference = truth, positive = "Closed")
+confus
+addmargins(confus$table)
+
+library(plotROC)
+df <- data.frame(response = as.numeric(truth=="Closed"), fit = fitted(fit))
+head(df)
+ROC.fit2 <- ggplot(df, aes(d = response, m = fit)) + 
+  geom_roc(labelround = 2)
+ROC.fit2
+calc_auc(ROC.fit2)
+```
+  

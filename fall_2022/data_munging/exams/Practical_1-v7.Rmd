@@ -1,0 +1,190 @@
+---
+title: "Practical Exam I"
+author: Joshua D. Ingram
+linkcolor: red
+output:
+  html_document:
+    toc: yes
+  pdf_document:
+    latex_engine: xelatex
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+  word_document:
+    toc: yes
+    toc_depth: 4
+fontsize: 11pt
+urlcolor: red
+editor_options: 
+  chunk_output_type: console
+---
+
+
+# [1.] The LifeCycleSavings dataset collects relationships between personal savings, per-capita disposable income, and other demographic data.  Using either a for loop, while loop, or apply:
+
+1.  For each column, print the average and standard deviation of measurements.
+
+**Answer:**
+
+```{r}
+# apply the mean and sd functions to each row
+sapply(LifeCycleSavings, function(x) c(average = mean(x), sd = sd(x)) )
+```
+
+
+2.  For each row, print the name of the country if dpi, sr, or both are above their respective median values.
+
+**Answer:**
+
+```{r}
+# select the subset of rows where dpi, sr, or both are above their respective median values.
+# print the rownames of that subset
+rownames(LifeCycleSavings[which(LifeCycleSavings$dpi > median(LifeCycleSavings$dpi) |
+                         LifeCycleSavings$sr > median(LifeCycleSavings$sr)),])
+
+```
+
+
+# [2.] In R and most other languages, processing steps and code paths are often tied to data type. For the CO2 dataset (see ?CO2):
+
+1. In code, determine the overall proportion of values stored as numeric ("num") or character ("chr") data types.
+
+**Answer:**
+
+```{r}
+# Assuming here that you don't want this by row...
+props <- c()
+for (i in 1:ncol(CO2)){
+  
+  props[i] <- mean(class(CO2[,i]) == "numeric")
+  
+}
+
+print(paste("Proportion of numeric values:", mean(props)))
+print(paste("Proportion of character values:", 1-mean(props)))
+```
+
+
+2. To a subset of the dataset containing only numeric columns, apply the cor() function, specifying Spearman correlation as the method.
+
+**Answer:**
+
+```{r}
+# Guessing using dplyr is not cheating... Otherwise I would have just selected column indices for numeric columns
+library(dplyr)
+co2_num <- select_if(CO2, is.numeric)
+
+cor(co2_num, method = "spearman")
+```
+
+
+3. Bonus: Ensure that the methods in 1. and 2. would work as expected even if the dataset contained missing values.
+
+# [3.] We would like to validate the ranges and categories of a manually entered dataset. We will use the built-in ToothGrowth dataset as an example (?ToothGrowth), which follows a study of the effects of vitamin C on tooth growth in guinea pigs.
+
+1. Determine the proportion of observations where tooth lengths are outside of the range of 7 to 27.
+
+**Answer:**
+
+```{r}
+# number of rows where condition held / number of rows
+length(which(ToothGrowth$len < 7 | ToothGrowth$len > 27))/nrow(ToothGrowth)
+```
+
+2. Write code that would identify any values of the treatment (supp) that are not in the set of expected values (vitamin C: "VC", Orange Juice: "OJ"). 
+
+**Answer:**
+
+```{r}
+# identify all rows where supp not VC or OJ, return only the unique values where this holds.
+# Assuming here you don't want the specific rows, just the values of supp
+unique(ToothGrowth[which(!(ToothGrowth$supp %in% c("VC", "OJ"))),]$supp)
+```
+
+3. Show that the code for part 2 works by modifying a copy of the original dataset. (If you overwrite the original copy by mistake, you can reload it with data(ToothGrowth).)
+
+**Answer:**
+
+```{r}
+# change supp column to characrter, change item 2 in column, change column back to factor with 3 levels.
+ToothGrowth_test <- ToothGrowth
+ToothGrowth_test$supp <- as.character(ToothGrowth_test$supp )
+ToothGrowth_test$supp[2] <- "VD"
+ToothGrowth_test$supp <- as.factor(ToothGrowth_test$supp)
+
+# returns the unexpected value found, VD
+unique(ToothGrowth_test[which(!(ToothGrowth_test$supp %in% c("VC", "OJ"))),]$supp)
+```
+
+
+# [4.] For the mtcars dataset (?mtcars), 
+
+1. Collect a random sample of 20 rows/cars.
+
+**Answer:**
+
+```{r}
+# WITHOUT REPLACEMENT
+mysample <- sample(mtcars)
+```
+
+
+2. Summarize the number of cars for each combination of cylinder, gear, and am values.
+
+```{r}
+
+# group by the three variables, count the number of occurrences
+mysample %>%
+  group_by(cyl, gear, am) %>%
+  count()
+
+```
+
+
+# [5.] Write a function that accepts a data frame and two column numbers as input, and returns the data frame with a new column that concatenates the values in the two columns indicated. These should be separated by a space, such that 3 and 4 become "3 4", or similar for character values.
+
+```{r}
+# input: df - dataframe object (data.frame), col1 - column index 1 (int), col2 - column index 2 (int)
+# return: df - df with new column newcol (data.frame)
+myfunction <- function(df, col1, col2){
+  
+  # create newcol
+  df$newcol <- paste(df[,col1], df[,col2])
+  
+  return(df)
+}
+
+```
+
+
+# [6.] The poliscidata package contains functions and datasets for studies in political science. The world dataset from this package is hosted on Canvas as "World_dataset.txt". Perform the following:
+
+1.  Download "World_dataset.txt" from Canvas and read it into a new variable, "world".
+
+```{r}
+library(readr)
+world <- read.csv("/Users/joshuaingram/Main/Projects/masters_coursework/fall_2022/data_munging/exams/World_data.txt", 
+                  sep = "\t")
+```
+
+
+2.  Within this dataset, "dem_score14" represents a scoring of openness in democratic institutions in each country from The Econonomist magazine in 2014. Summarize the maximum and minimum values of this score for each level of dem_level4.
+
+```{r}
+world %>%
+  group_by(dem_level4) %>%
+  summarise(min = min(dem_score14), max = max(dem_score14))
+```
+
+
+3.  Bonus: Do this for each unique combination of values in dem_level4 and another categorical variable of your choice, and using methods from dplyr.
+
+```{r}
+
+world %>%
+  group_by(dem_level4, regionun) %>%
+  summarise(min = min(dem_score14), max = max(dem_score14))
+
+```
+
+

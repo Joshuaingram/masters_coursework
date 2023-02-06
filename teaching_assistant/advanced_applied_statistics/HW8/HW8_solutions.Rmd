@@ -1,0 +1,177 @@
+---
+title: "Advanced Applied Statistics Homework 8 Solutions"
+author: "Joshua D. Ingram"
+date: "2022-12-05"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(nimble)
+library(tidyverse)
+
+crime <- read.csv("/Users/joshuaingram/Main/Projects/masters_coursework/teaching_assistant/advanced_applied_statistics/HW8/WashingtonPostCrimeData.csv")
+
+crime <- crime %>% 
+  mutate(disposition = factor(disposition, 
+                              levels=c("Open/No arrest", "Closed without arrest", "Closed by arrest"),
+                              ordered=TRUE),
+         disposition_binary = fct_collapse(disposition, "Open" = "Open/No arrest", 
+                                           "Closed" = c("Closed without arrest", "Closed by arrest")),
+         age = as.numeric(victim_age),
+         race = factor(victim_race),
+         sex = factor(victim_sex)
+  ) %>%
+  select("disposition_binary", "age", "race", "sex") %>%
+  drop_na()
+
+crime <- crime %>% 
+  mutate(disposition_binary = ifelse(disposition_binary == "Open", 0, 1))
+```
+
+As mentioned in class, we are going to try our hands on fitting a logistic regression model not via maximum likelihood (although now you have a deep understanding how that is done), but with the Bayesian approach.
+
+Let's use the Washington Post dataset from the previous HW for it.
+
+# Problem 1
+
+Fit the Bayesian Logistic regression model using age as the only predictor. Show the MCMC chains graphically, and the posterior distributions of the intercept and slope. Compare the ML estimators to the Bayesian posterior mean.
+
+**Answer:** The ML estimators $\hat{\alpha}_{ML} = 0.0040687$ and $\hat{\beta}_{ML} = 0.0057287$ are very similar to the Bayesian posterior means $\hat{\alpha}_{Bayes} = 0.004436559$ and $\hat{\beta}_{Bayes} = 0.005715810$.
+
+```{r}
+# logistic regression model
+y <- crime$disposition_binary
+x <- crime$age
+n <- nrow(crime)
+
+# code for the Bayesian model
+code <- nimbleCode({
+  
+  alpha ~ dnorm(0, sd = 1000)
+  beta ~ dnorm(0, sd = 1000)
+  
+  for (i in 1:n){
+    
+    eta[i] <- alpha + beta * x[i]
+    pi[i] <- exp(eta[i]) / (1 + exp(eta[i]))
+    y[i] ~ dbern(pi[i])
+    
+  }
+  
+})
+
+constants <- list(n = n, x = x)
+data <- list(y = y)
+initial <- list(alpha = mean(y), beta = 0)
+Rmodel <- nimbleModel(code, constants, data, initial)
+
+# visualizing MCMC chain
+# Rmodel$plotGraph()
+```
+
+```{r}
+conf <- configureMCMC(Rmodel)
+
+Rmcmc <- buildMCMC(conf)
+Cmodel <- compileNimble(Rmodel)
+
+Cmcmc <- compileNimble(Rmcmc, project = Rmodel)
+
+set.seed(22)
+results <- runMCMC(Cmcmc, niter = 11000, nburnin = 1000, samples = TRUE, summary = TRUE)
+
+results$summary
+```
+
+```{r}
+# Visualize MC
+df <- as_tibble(results$samples) %>%
+  pivot_longer(cols = c("alpha", "beta"), names_to = "Parameter", values_to = "Values") %>%
+  add_column(Sequence = rep(1:nrow(results$samples), ncol(results$samples)))
+  
+ggplot(data = df, aes(x = Sequence, y = Values)) +
+  geom_line(col = "lightblue") +
+  geom_point(col = "blue", pch = 16, size = 0.2, alpha = 0.5) +
+  facet_wrap(vars(Parameter), nrow = 3, scale = "free_y") +
+  labs(x = "MCMC Simulation Number",
+       y = "Samples of Parameters",
+       title = "Markov Chain Monte Carlo Samples")
+```
+
+```{r}
+# Visualize Posterior Distribution
+ggplot(data = df, aes(x = Values, fill = Parameter)) +
+  geom_density(color = "black") +
+  facet_wrap(vars(Parameter), nrow = 3, scale = "free") +
+  labs(title = "Approximations of Posterior Distributions") +
+  theme(legend.position = "none")
+```
+
+```{r}
+# Logistic regression model with MLE
+fit <- glm(disposition_binary ~ age, family = binomial(link = logit), data = crime)
+summary(fit)
+```
+
+
+# Problem 2
+
+Using the Bayesian model above, provide the estimated probability of success (a closed case) at an age of 40 years? Show the entire posterior of the probability of success.
+
+**Answer:** Predicted probability of success (closed case) at age 40 = 0.555. This is very close to the prediction for the ML logistic regression model at 0.5580417.
+
+```{r}
+# logistic regression model
+y <- crime$disposition_binary
+x <- crime$age
+n <- nrow(crime)
+
+# code for the Bayesian model
+code <- nimbleCode({
+  
+  alpha ~ dnorm(0, sd = 1000)
+  beta ~ dnorm(0, sd = 1000)
+  
+  for (i in 1:n){
+    
+    eta[i] <- alpha + beta * x[i]
+    pi[i] <- exp(eta[i]) / (1 + exp(eta[i]))
+    y[i] ~ dbern(pi[i])
+    
+  }
+  yhat ~ dbern( exp(alpha + beta * 40) / (1 + exp(alpha + beta * 40)))
+})
+
+constants <- list(n = n, x = x)
+data <- list(y = y)
+initial <- list(alpha = mean(y), beta = 0)
+Rmodel <- nimbleModel(code, constants, data, initial)
+
+conf <- configureMCMC(Rmodel)
+
+conf$addMonitors("yhat")
+
+Rmcmc <- buildMCMC(conf)
+Cmodel <- compileNimble(Rmodel)
+
+Cmcmc <- compileNimble(Rmcmc, project = Rmodel)
+
+set.seed(22)
+results <- runMCMC(Cmcmc, niter = 11000, nburnin = 1000, samples = TRUE, summary = TRUE)
+
+results$summary
+
+```
+
+```{r}
+predict(fit, newdata=data.frame(age = 40), type = "response", interval="prediction")
+
+df <- as.data.frame(results$samples)
+
+## Posterior distribution for prediction at age 40
+ggplot(data = df, aes(x=yhat)) +
+  geom_density(color="black", fill="orange") +
+  labs(title = "Posterior Predictive Distribution for age = 40",
+       x = "Values")
+```

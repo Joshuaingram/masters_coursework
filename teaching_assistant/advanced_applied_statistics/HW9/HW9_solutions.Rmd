@@ -1,0 +1,92 @@
+---
+title: "Advanced Applied Statistics Homework 9 Solutions"
+author: "Joshua D. Ingram"
+date: "2022-12-07"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(flexsurv)
+
+snake <- read.csv("/Users/joshuaingram/Main/Projects/masters_coursework/teaching_assistant/advanced_applied_statistics/HW9/snake.csv")
+```
+
+# Read
+
+Study the handout, and also read the one-page summary of the Kaplan-Meier estimator and Cox's proportional hazard model on the paper attached.
+
+# Problem 1
+
+Fit an Exponential or a Weibull regression model to investigate the effect of sex on the hazard of crashing in the game Snake, based on the small dataset of survival times we observed in class. Make sure to interpret the effect of sex on the hazard, and to plot both the hazard function and the implied survival function. Estimate the median survival time when sex = female.
+
+**Answer:**
+
+## Exponential Regression Model
+
+```{r}
+# Fit exponential regression model
+fit_exp <- flexsurvreg(Surv(time = y, event = censored) ~ sex, dist = "exp", data = snake)
+fit_exp
+```
+
+```{r}
+pred.hazard_m = predict(fit_exp, newdata=data.frame(sex = "m"), type="hazard", times=seq(1,80,5))
+pred.hazard_f = predict(fit_exp, newdata=data.frame(sex = "F"), type="hazard", times=seq(1,80,5))
+pred.hazm = as.data.frame(pred.hazard_m$.pred)
+pred.hazf = as.data.frame(pred.hazard_f$.pred)
+pred.haz = merge(pred.hazm, pred.hazf, by = ".time")
+
+plot(pred.haz$.time, pred.haz$.pred_hazard.y, type="l", col="blue", lwd=2, main="Hazard", xlab="Time (sec)", ylab="Hazard Function h(t)", ylim=c(0,0.025))
+lines(pred.haz$.time, pred.haz$.pred_hazard.x, col="red", lwd=2)
+
+plot(fit_exp, newdata = data.frame(sex = "m"), type = "hazard", col = "blue", ci = FALSE, 
+     main = "Hazard", xlab = "Time (sec)", ylab = "Fitted Hazard Function h(t)")
+lines(fit_exp, newdata = data.frame(sex = "F"), type = "hazard", col = "red", ci = FALSE)
+```
+
+```{r}
+plot(fit_exp, newdata = data.frame(sex = "m"), type = "survival", col = "blue", col.obs = "white", ci = FALSE,
+     main = "Survival", xlab = "Time (sec)", ylab = "Survival Function S(t)")
+lines(fit_exp, newdata = data.frame(sex="F"), type = "survival", col = "red", ci = FALSE)
+```
+
+```{r}
+summary(fit_exp, type="median", newdata = data.frame(sex='F'))
+```
+
+
+## Weibull Regression Model
+
+```{r}
+fit_weib <- flexsurvreg(Surv(time = y, event = censored) ~ sex, dist = "weibullPH", data = snake)
+fit_weib
+```
+
+```{r}
+pred.hazard_m = predict(fit_weib, newdata=data.frame(sex = "m"), type="hazard", times=seq(1,80,5))
+pred.hazard_f = predict(fit_weib, newdata=data.frame(sex = "F"), type="hazard", times=seq(1,80,5))
+pred.hazm = as.data.frame(pred.hazard_m$.pred)
+pred.hazf = as.data.frame(pred.hazard_f$.pred)
+pred.haz = merge(pred.hazm, pred.hazf, by = ".time")
+
+plot(pred.haz$.time, pred.haz$.pred_hazard.y, type="l", col="blue", lwd=2, main="Hazard", xlab="Time (sec)", ylab="Hazard Function h(t)", ylim=c(0,0.025))
+lines(pred.haz$.time, pred.haz$.pred_hazard.x, col="red", lwd=2)
+
+plot(fit_weib, newdata = data.frame(sex = "m"), type = "hazard", col = "blue", ci = FALSE,
+     main = "Hazard", xlab = "Time (sex)", ylab = "Fitted Hazard Function h(t)")
+lines(fit_weib, newdata = data.frame(sex = "F"), type = "hazard", col = "red", ci = FALSE, ylab = c(0, 0.03))
+```
+
+```{r}
+plot(fit_weib, newdata = data.frame(sex = "m"), type = "survival", col = "blue", col.obs = "white", ci = FALSE,
+     main = "Survival", xlab = "Time (sex)", ylab = "Fitted Survival Function S(t)")
+lines(fit_weib, newdata = data.frame(sex = "F"), type = "survival", col = "red", ci = FALSE)
+
+```
+
+```{r}
+summary(fit_weib, type="median", newdata = data.frame(sex='F'))
+```
+

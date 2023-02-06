@@ -1,0 +1,4 @@
+{
+    "ecl.launchConfiguration": "training_cluster",
+    "ecl.targetCluster": {}
+}

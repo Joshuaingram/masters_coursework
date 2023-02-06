@@ -1,0 +1,37 @@
+---
+title: "Advanced Applied Statistics Final Project"
+author: "Joshua D. Ingram"
+date: "2022-12-07"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(nimble)
+library(tidyverse)
+
+crime <- read.csv("/Users/joshuaingram/Main/Projects/masters_coursework/teaching_assistant/advanced_applied_statistics/HW8/WashingtonPostCrimeData.csv")
+
+crime <- crime %>% 
+  mutate(disposition = factor(disposition, 
+                              levels=c("Open/No arrest", "Closed without arrest", "Closed by arrest"), ordered=TRUE),
+         disposition.binary = fct_collapse(disposition, "Open" = "Open/No arrest", 
+                                           "Closed" = c("Closed without arrest", "Closed by arrest")),
+         age = as.numeric(victim_age),
+         race = factor(victim_race),
+         sex = factor(victim_sex)
+  ) %>%
+  select("disposition.binary", "age", "race", "sex") %>%
+  drop_na()
+```
+
+As a final group project, please refer to the attached article "Forecasting determinants of recurrence in lung cancer patients exploiting various machine
+learning models".
+
+- Read the article (at times, it reads a bit weird. In particular, I don't like the section on logistic regression, which doesn't explain it very well. I think you would all do better!)
+- Obtain the data and as closely as possible, follow their data cleaning procedures.
+- Fit a logistic regression model for the probability of recurrence, using model selection techniques to come up with a final model that you want to use for prediction. You do not have to use all the procedures that the article mentions, but you should do some model selection to identify "the best" set of predictors. You can also try to use a Bayesian approach once you found your final model, and see if that improves your predictions.
+- Discuss your model a bit, taking hints from the paper. In particular, can you replicate their results for the logistic regression model, i.e., what they mention in the abstract? (Don't worry about the other machine learning models mentioned in the article.)
+- Prepare an RMarkdown document that I can use, when I run it on my computer, to replicate your model and model selection.
+- Prepare slides (at most 8) that summarize your approach and findings.
+- Each team member needs to upload both the RMrkdown files, the dataset the RMarkdown file refers to, and the slides to Canvas.

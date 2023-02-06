@@ -1,0 +1,320 @@
+---
+title: "Practical Exam III"
+author: Joshua D. Ingram
+linkcolor: red
+output:
+  pdf_document:
+    latex_engine: xelatex
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+  html_document:
+    toc: yes
+  word_document:
+    toc: yes
+    toc_depth: 4
+fontsize: 11pt
+urlcolor: red
+editor_options: 
+  chunk_output_type: console
+---
+
+On this exam there will be two questions investigating trends in data science using the yearly Machine Learning and Data Science survey from Kaggle ("kaggle_survey_2020_responses.csv" posted on Canvas, with kaggle_survey_2020_answer_choices.pdf for reference), followed by four questions on broader methods for exploratory analysis.
+
+Wherever possible, illustrate your answers with exploratory visualizations, summaries, tables, and/or brief descriptions. 
+
+For the first two questions, the first chunk below may help to organize the data and show the correspondence between question text and column names. The ml.part data frame is a subset of ml.full containing single-column categorical responses.
+
+```{r}
+
+# Setup: Check for and install packages as needed
+c("dplyr", "ggplot2", "tidyverse", "nycflights13", "beeswarm", "vioplot") %in% installed.packages()[,1]
+
+# install.packages("dplyr")
+# install.packages("ggplot2")
+# install.packages("tidyverse")
+# install.packages("nycflights13")
+# install.packages("beeswarm")
+# install.packages("vioplot")
+
+```
+
+
+```{r}
+
+# Install and load any required packages:
+library(tidyverse)
+library(reshape2)
+library(DataExplorer)
+
+# Identify categorical columns
+ct.cols <- c("Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q8", "Q11",
+             "Q13", "Q15", "Q20", "Q21", "Q22", "Q24", "Q25", 
+             "Q30", "Q32", "Q38")
+
+# Read dataset
+ml.full <- read.csv("kaggle_survey_2020_responses.csv")
+
+# Summarize question vs. column correspondence
+ml.full.qs <- data.frame(colnames(ml.full))
+rownames(ml.full.qs) <- ml.full[1, ]
+
+# Remove question row, factorize
+ml.full <- data.frame(ml.full[-1,])
+ml.full <- ml.full %>% mutate_if(is.character, as.factor)
+
+# Subset to categorical columns
+ml.part    <- ml.full    %>% select(all_of(ct.cols))
+ml.part.qs <- ml.full.qs %>% filter(colnames.ml.full. %in% ct.cols)
+
+# Uncomment to check dataset and questions
+# View(ml.full)
+# View(ml.full.qs)
+# View(ml.part.qs)
+```
+
+# [1.] What relationships exist between the time spent on survey responses (Q0), primary job descriptions (Q5), and primary processing tools (Q38)?
+
+**Answer:**
+
+```{r}
+# str(ml.part)
+
+# Q1 column is not the time spent on the survey response, but the age. I am renaming the first column name (Time.from.Start.to.Finish..seconds.) to Q0 (in last code chunk)
+colnames(ml.full)[1] <- "Q0"
+
+ml.sub <- ml.full %>% select(Q0, Q5, Q38)
+ml.sub$Q0 <- as.numeric(ml.sub$Q0)
+
+#####
+# finding mean time for each job
+#####
+mean_times <- ml.sub %>% 
+  group_by(Q5) %>%
+  summarise(mean_time = mean(Q0))
+mean_times
+
+# data visualization
+ggplot(data = ml.sub, aes(x = Q0, fill = Q5)) + geom_boxplot()
+
+# ANOVA
+anova1 <- aov(Q0 ~ Q5, data = ml.sub)
+summary(anova1)
+
+####
+# relationship between job description and primary processing tools (proportions)
+####
+ggplot(data = ml.sub, aes(x = Q38, fill = Q5)) + 
+  geom_bar(position = "fill") +
+  labs(y = "Proportion", x = "Tools used") + 
+  scale_x_discrete(labels = c("","Advanced","Basic", "BI", "Cloud", "Local", "Other"))
+
+# chi square test
+chisq.test(ml.sub$Q5, ml.sub$Q38, correct=FALSE)
+
+
+```
+
+After conducting an ANOVA test, and obtaining a very small p-value close to 0, we have significant evidence to suggest that the job description of the respondent has an effect on the average amount of time spent on the survey. We can see differences in the variances and medians in the boxplot above.
+
+In addition, after conducting a chi-square test, we have significant evidence to suggest that the job description of the respondent and the primary processing tool are not independent of one another. This relationship can be further observed in segmented bar chart.
+
+
+# [2.] Create your own question to ask and answer using this dataset.
+
+**Answer:**
+
+Is there a relationship between size of the company (Q20) and their yearly compensation (Q24)?
+
+```{r}
+ml.sub <- ml.full %>% select(Q20, Q24)
+str(ml.sub)
+
+# ordering levels so plots look better... this took some time
+ml.sub$Q20 <- factor(ml.sub$Q20, 
+                     levels = c("", "0-49 employees", 
+                                "50-249 employees", "250-999 employees",
+                                "1000-9,999 employees", "10,000 or more employees"))
+ml.sub$Q24 <- factor(ml.sub$Q24, 
+                     levels = c("", "$0-999", "1,000-1,999", "2,000-2,999", 
+                                "3,000-3,999", "4,000-4,999", "5,000-7,499",
+                                "7,500-9,999", "10,000-14,999", "15,000-19,999",
+                                "20,000-24,999", "25,000-29,999", "30,000-39,999",
+                                "40,000-49,999", "50,000-59,999", "60,000-69,999",
+                                "70,000-79,999", "80,000-89,999", "90,000-99,999", 
+                                "100,000-124,999", "125,000-149,999", "150,000-199,999",
+                                "200,000-249,999", "250,000-299,999", "300,000-500,000",
+                                "> $500,000"))
+
+ggplot(data = ml.sub, aes(x = Q20, fill = Q24)) + 
+  geom_bar(position = "fill") +
+  labs(y = "Proportion", x = "Employees") + 
+  scale_x_discrete(labels = c("","0-49","50-249", "250-999", "1000-9,999", "10,000+"))
+
+# chi square test
+chisq.test(ml.sub$Q20, ml.sub$Q24, correct=FALSE)
+
+```
+
+According to the chi-square test, we have significant evidence to suggest that the size of the company effects the yearly compensation. This is visualized in the segmented bar chart, where we can see that respondents making small compensations (less than \$5,000) make up a larger proportion at smaller companies. 
+
+
+# [3.] Exploratory visualization principles
+
+Three plots depicting the distribution of price per cut category for a subset of the ggplot2 diamonds dataset are shown below. For these:
+
+a. Briefly discuss how these plots align (or fail to align) to the principles for clear data display.
+
+**Answer:**
+
+All three plots are lacking in color to better identify the different categories. The second plot (beeswarm) is not an ideal visualization because there are so many points that depending on the category, it is difficult to make out the individual points. The violin plot is a nice balance between the boxplot and the beeswarm plot, showing us the density of the data and other valuable statistics, without being overwhelemd by too many data points, or underwhelmed by the simplicity of the boxplot where we can't make out how the values on fully distributed. Also missing a unit scale for the price and a title.
+
+```{r}
+
+# install.packages("beeswarm")
+# install.packages("vioplot")
+# install.packages("ggplot2")
+library(beeswarm)
+library(vioplot)
+library(ggplot2)
+
+set.seed(1234)
+diam.1k <- diamonds[sample(nrow(diamonds), 1000),]
+
+# Set plot window layout:
+par(mfrow=c(3,1), mar = c(2,2,0.2,0))
+
+# 1. 
+boxplot(diam.1k$price ~ diam.1k$cut, ylim=c(500, 12000))
+
+# 2.
+beeswarm(diam.1k$price ~ diam.1k$cut, corral = "wrap")
+
+# 3. 
+vioplot(diam.1k$price ~ diam.1k$cut, col="grey30")
+
+
+# Reset plot layout to defaults
+par(mfrow = c(1, 1), mar = c(5, 4, 4, 2) + 0.1)
+
+```
+
+b. Make two modifications to one of these plots to improve the presentation.
+
+**Answer:**
+
+Modifying the boxplot by adding color and scale so that we don't observe a cutoff in the "good" category, and changing visualization to be made with ggplot. Also adding a title for the plot. 
+
+```{r}
+ggplot(data = diam.1k, aes(x = price, fill = cut)) + 
+  geom_boxplot() + 
+  labs(x = "Price ($)", title = "Distribution of Diamond Prices ($) by Cut Category")
+```
+
+
+
+# [4.] Exploratory analysis
+
+The flights dataset in the nycflights13 package contains a summary of all flights leaving New York City in 2013. What relationships appear to exist between departure delays (dep_delay) and month? Does this change for different times of day? Create a plot or summary to examine these relationships.
+
+Note: This dataset has 336,776 rows and 19 columns, so use the flights.1k subset created below to avoid freezes for the remaining plots.
+
+```{r}
+
+# Package setup
+# install.packages("nycflights13")
+library(nycflights13)
+head(flights)
+# ?flights
+
+# Create subset for plot testing
+set.seed(1234)
+flights.1k <- flights[sample(nrow(flights), 1000),]
+
+```
+
+**Answer:**
+
+```{r}
+ggplot(data = flights.1k, aes(x = dep_delay, fill = as.factor(month))) + 
+  geom_boxplot() +
+  labs(x = "Departure Delay Time")
+
+ggplot(data = flights.1k, aes(as.factor(month), dep_delay, fill = as.factor(month))) +
+  geom_bar(position = "dodge",
+           stat = "summary",
+           fun = "mean") + 
+  labs(x = "Month", y = "Average Delay Time")
+
+# mean departure times by month
+mean_dep <- flights.1k %>% 
+  group_by(as.factor(month)) %>%
+  summarise(mean_time = mean(dep_delay, na.rm = TRUE))
+mean_dep
+
+# ANOVA
+anova2 <- aov(dep_delay ~ as.factor(month), data = flights.1k)
+summary(anova2)
+```
+
+Both by visual and statsitical tests, we can see that there is a relationship between the month of the year and the average departure delay. Most noticeably, there is a spike in delays in July (7) (major spike likely caused by the outliers). In addition, in the months of December (12) and February (2) the average departure delays are much higher. 
+
+# [5.] Complex visualizations in ggplot2
+
+Preferably with ggplot2, create a visualization of the flights.1k dataset (defined above) that summarizes information on as many variables as possible simultaneously. For this question, consider clear interpretability and good design optional. Bonus: Make some aspect of the visualization interactive.
+
+```{r}
+library(plotly)
+# deciding to use plotly for 3d visualization
+plot_ly(x=flights.1k$distance, y=flights.1k$dep_delay, z=flights.1k$month, color=flights.1k$carrier,
+        data = flights.1k,
+        type="scatter3d", mode="markers") %>%
+  layout(scene = list(xaxis=list(title = "Distance"),
+                      yaxis=list(title = "Departure Delay"),
+                      zaxis=list(title = "Month")))
+
+```
+
+
+# [5.] Using the discussion at https://stackoverflow.com/questions/1299871, connect the origin and destination (dest) airport columns in the flights dataset from the nycflights13 package to their latitude and longitudes, which are provided in the airports dataset. This should create a merged dataset that adds airport names to flights or flights.1k.
+
+Bonus: Create a map that links origin and destination for 50 arbitrarily selected flights. (Hint: the leaflet package can produce maps from providers that do not require an API key for map downloads.)
+
+```{r}
+
+flights$dest
+flights$origin
+airports$faa
+
+# here .x columns refer to the destination airport and .y columns refer the origin airport
+df <- merge(flights, airports, all.x = TRUE, by.x = "dest", by.y = "faa")
+df <- merge(df, airports, all.x = TRUE, by.x = "origin", by.y = "faa")
+```
+
+
+## [6.] EDA automation
+
+First, read the "nationwidechildrens.org_clinical_patient_hnsc.txt" dataset into a new variable, hnsc.df. treating either "[Not Available]" or all bracketed values (like "[Not Applicable]", etc.) as NAs.
+
+Then, using the DataExplorer or finalfit package, produce a visual summary of the combinations of missingness per column. Ideally, focus this on columns with 10% to 90% missing values. Briefly describe any trends you observe in columns that tend to be missing together.
+
+```{r}
+
+# install.packages("DataExplorer")
+# install.packages("finalfit")
+library(finalfit)
+
+hnsc.df <- read.csv("/Users/joshuaingram/Main/Projects/masters_coursework/fall_2022/data_munging/exams/true.txt")
+
+
+
+```
+
+
+
+
+
+
+
+
+

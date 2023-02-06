@@ -1,0 +1,209 @@
+---
+title: "Dealing with Data II Homework 7 Solutions"
+author: "Joshua D. Ingram"
+date: "2022-12-08"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Reading - Textbook Chapter 13
+
+## a) Section 13.1
+
+## b) Section 13.2
+
+Do not pay much attention of the formula, but rather where you can find statistics, such as R^2 or the F statistic, in output.
+
+## c) Section 13.3
+
+This covers the overall F-test, but does not talk much about the nested F-test, which we covered in class. However, the section mentions the t-test for testing individual regression coefficients. For testing individual regression coefficients, the t-test and the F-test comparing nested models are the same.
+
+**Answer:**
+
+## d) Section 13.4
+
+We already discussed residual plots when we did simple linear regression at the beginning of the semester, this is just a bit more information.
+
+## e) Section 13.5
+
+About categorical predictors and interactions, which we have already covered.
+
+# Textbook Exercises - Chapter 13
+
+## 13.6 - Crime rate and income
+
+Refer to the previous exercise. MINITAB reports the following results for the multiple regression of $y =$ crime rate on $x_1 =$ median income (in thousands of dollars) and $x_2 =$ urbanization.
+
+(This refers to the same dataset that we have analyzed in class. Get it into R and fit and answer all parts of the question using R.)
+
+### a) Report the prediction equations relating crime rate to income at
+
+```{r}
+crime <- read.csv("/Users/joshuaingram/Main/Projects/masters_coursework/teaching_assistant/dealing_with_data_ii/HW7/fl_crime.csv")
+colnames(crime) <- c("county", "crime_rate", "education", "urbanization", "median_income")
+
+fit <- lm(crime_rate ~ median_income + urbanization, data = crime)
+summary(fit)
+```
+
+#### (i) urbanization levels of 0. Interpret
+
+**Answer:**
+
+$$
+\hat{y_i} = 39.9723 - 0.7906 x_{1,i}
+$$
+
+Holding urbanization constant at 0, for every thousand dollar increase in median income we expect the crime rate to decrease by 0.79 per thousand people on average.
+
+#### (ii) urbanization levels of 100. Interpret
+
+**Answer:**
+
+$$
+\hat{y_i} = 39.9723 - 0.7906 x_{1,i} + 64.18
+$$
+
+Holding urbanization constant at 100, for every thousand dollar increase in median income we expect the crime rate to decrease by 0.79 per thousand people on average. The crime rate for urbanization levels at of 100 is expected to be 64.18 per thousand people greater than urbanization levels of 0.
+
+### b) 
+
+For the simple regression model relating $y =$ crime rate to $x = income$, MINITAB reports
+
+$$
+\text{crime } = -11.6 + 2.61 \text{ income}_i
+$$
+
+Interpret the effect of income, according to the sign of its slope. How does this effect differ from the effect of income in the multiple regression equation?
+
+**Answer:**
+
+For every one thousand dollar increase in median income, the crime rate increases by 2.61 per thousand people on average. This effect displays a positive relationship between relationship between income and crime rate, whereas the multiple regression shows a negative relationship between crime and median income.
+
+### c) Use the estimated slope for income in the simple and multiple regression model to explain the difference in the interpretation of the slope when
+
+#### (i) ignoring urbanization
+
+**Answer:**
+
+For every one thousand dollar increase in median income, the crime rate increases by 2.61 per thousand people on average.
+
+#### (ii) controlling urbanization.
+
+**Answer:**
+
+Holding urbanization constant, for every thousand dollar increase in median income we expect the crime rate to increase by 0.79 per thousand people on average.
+
+## 13.11 - Used cars
+
+The following data are from a random sample of campus newspaper ads on used cars for sale. Consider the age and horsepower (HP) of a car to predict its selling price.
+
+(Use R where relevant)
+
+### a) Construct a scatterplot matrix to investigate the relationship among price, age, and horsepower and interpret.
+
+**Answer:**
+
+```{r}
+cars <- read.csv("/Users/joshuaingram/Main/Projects/masters_coursework/teaching_assistant/dealing_with_data_ii/HW7/UsedCars.csv")
+plot(cars[,c(2, 3, 4)])
+```
+
+There is a weak to moderate positive relationship between price and HP. There is a moderate negative relationship between price and age. There is a weak negative relationship between age and HP.
+
+### b) Find the multiple regression prediction equation for the selling price in terms of age and horsepower of 80 and
+
+```{r}
+fit <- lm(Price ~ Age + HP, data = cars)
+summary(fit)
+```
+
+$$
+\hat{y_i} = 19,348.71 - 1,406.30 \text{ age}_i + 25.54 \text{ HP}_i
+$$
+
+#### (i) is 8 years old, rounded to the nearest hundred?
+
+**Answer:**
+
+$$
+\hat{y_i} = 19,348.71 - 1,406.30 * 8 + 25.54 * 80 = 10,141.51.
+$$
+
+#### (ii) is 10 years old, rounded to the nearest hundred?
+
+**Answer:**
+
+$$
+\hat{y_i} = 19,348.71 - 1,406.30 * 10 + 25.54 * 80= 7,328.91.
+$$
+
+### c) Based on this multiple regression, can you predict the price difference between a car with 60 HP and a car with 80 HP without knowing the ages of the two cars? Explain.
+
+**Answer:**
+
+No, we need to know the age of the cars to predict the price difference. We can do this by holding the age constant, and finding the difference in the effects of prices for a car with 60 HP and a car with 80 HP.
+
+## 13.41 - U.S. and foreign used cars
+
+Refer to the used car data file from Exercise 13.11. The prediction equation relating $y =$ selling price of used car (in \$) as a function of $x_1 =$ age of car and $x_2 =$ type of car (1 = U.S., 0 = Foreign) is $\hat{y} = 20,493 - 1,185x_1 - 2,379x_2$.
+
+(Use R to verify all outputs. In addition, answer the following question: Fit and plot the model that allows for the effect of age to depend on the type of car. Describe the effect of age on the predicted sales price for cars that are from the US, and compare that to the effect of age when cars are foreign.)
+
+### a) Using this equation, find the prediction equation relating selling price and age, separately for U.S. and foreign cars.
+
+**Answer:**
+
+U.S. Cars:
+
+$$
+\hat{y_i} = 20,493 - 1,185 \text{x}_{1,i} + 2,379
+$$
+
+Foreign Cars:
+
+$$
+\hat{y_i} = 20,493 - 1,185 \text{x}_{1,i}
+$$
+
+### b) Predict by how much the price changes for a one year increase in the age of the car. Does this apply for both types of cars? Explain.
+
+**Answer:**
+
+For every one year increase in age of the car, the predicted price decreases by \$1,185 on average. This applies to both types of cars.
+
+### c) Find the predicted price of a (i) U.S. and (ii) foreign car that is eight years old. Show how the difference between them relates to a parameter estimate for the model.
+
+**Answer:**
+
+U.S. Cars:
+
+$$
+\hat{y_i} = 20,493 - 1,185 * 8 + 2,379 = 13,392
+$$
+
+
+Foreign Cars:
+
+$$
+\hat{y_i} = 20,493 - 1,185 * 8 = 1,1013
+$$
+
+The difference in the prices of the two types of cars is equal to the coefficient for $x_2$.
+
+# Online Lending
+
+Refer to the Online Lending dataset that we briefly analyzed in class. (It is available on Canvas under Files -> Datasets.) Pick a few variables (at least one continuous and one categorical) and fit a linear regression model in R, using the interest rate as the response variable (as we did in class). Write a paragraph about your analysis and what you learned. Include at least one useful plot into your paragraph.
+
+**Answer:**
+
+```{r}
+loans <- read.csv("/Users/joshuaingram/Main/Projects/masters_coursework/teaching_assistant/dealing_with_data_ii/HW7/OnlineLending.csv")
+
+fit <- lm(Interest.Rate ~ Income + FICO.Score + Home, data = loans)
+summary(fit)
+```
+
